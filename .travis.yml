@@ -1,0 +1,28 @@
+language: python
+sudo: false
+
+cache: pip
+
+python:
+  - "3.5"
+
+branches:
+  only:
+    - master
+
+before_install:
+  - pip install --no-cache-dir -U -r requirements-test.txt
+  - ./runflake8
+  - ./runisort
+
+install:
+  - pip install "django>=2.0,<2.1"
+  - python setup.py -q develop
+
+# command to run tests, e.g. python setup.py test
+script:
+  - ./tests/manage.py makemigrations --dry-run django_ipam | grep "No changes detected"
+  - coverage run --source=django_ipam runtests.py
+
+after_success:
+coveralls
