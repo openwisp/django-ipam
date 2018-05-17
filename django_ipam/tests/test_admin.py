@@ -3,7 +3,7 @@ from unittest import skipIf
 
 from django.test import TestCase
 
-from django_ipam.models import IPAddress, Subnet
+from django_ipam.models import IpAddress, Subnet
 
 from .base.test_admin import BaseTestAdmin
 
@@ -12,4 +12,4 @@ from .base.test_admin import BaseTestAdmin
 class TestAdmin(TestCase, BaseTestAdmin):
     app_name = 'django_ipam'
     subnet_model = Subnet
-    ipaddress_model = IPAddress
+    ipaddress_model = IpAddress

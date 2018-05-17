@@ -1,9 +1,9 @@
 from django.contrib.admin import ModelAdmin
 
 
-class AbstractSubnetAdmin(ModelAdmin):
+class AbstractIpAddressAdmin(ModelAdmin):
     pass
 
 
-class AbstractIPAddressAdmin(ModelAdmin):
+class AbstractSubnetAdmin(ModelAdmin):
     pass

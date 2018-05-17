@@ -1,11 +1,11 @@
 from django.contrib import admin
 
-from .base.admin import AbstractIPAddressAdmin, AbstractSubnetAdmin
-from .models import IPAddress, Subnet
+from .base.admin import AbstractIpAddressAdmin, AbstractSubnetAdmin
+from .models import IpAddress, Subnet
 
 
-@admin.register(IPAddress)
-class IPAddressAdmin(AbstractIPAddressAdmin):
+@admin.register(IpAddress)
+class IPAddressAdmin(AbstractIpAddressAdmin):
     pass
 
 
