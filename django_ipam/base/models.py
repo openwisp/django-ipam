@@ -9,9 +9,11 @@ from openwisp_utils.base import TimeStampedEditableModel
 
 from .fields import NetworkField
 
+HELP_TEXT = 'Enter valid CIDR network field, for example - IPv4: 10.0.0.0/24 or IPv6: fdb6:21b:a477::9f7/64'
+
 
 class AbstractSubnet(TimeStampedEditableModel):
-    subnet = NetworkField(default="10.0.0.0/24", db_index=True)
+    subnet = NetworkField(help_text=HELP_TEXT, db_index=True)
     description = models.CharField(max_length=100, blank=True)
     master_subnet = models.ForeignKey('self', on_delete=models.CASCADE,
                                       blank=True, null=True,
@@ -28,8 +30,9 @@ class AbstractSubnet(TimeStampedEditableModel):
 
     def clean(self):
         for subnet in swapper.load_model("django_ipam", "Subnet").objects.filter().values():
-            if ip_network(self.subnet).overlaps(subnet["subnet"]):
-                raise ValidationError({'subnet': _('Subnet overlaps with %s') % (subnet["subnet"])})
+            if self.id != subnet["id"]:
+                if ip_network(self.subnet).overlaps(subnet["subnet"]):
+                    raise ValidationError({'subnet': _('Subnet overlaps with %s') % (subnet["subnet"])})
 
 
 class AbstractIpAddress(TimeStampedEditableModel):
@@ -52,5 +55,6 @@ class AbstractIpAddress(TimeStampedEditableModel):
         if self.subnet_id and ip_address(self.ip_address) not in self.subnet.subnet:
             raise ValidationError({'ip_address': _('IP address does not belong to the subnet')})
         for ipaddr in swapper.load_model("django_ipam", "IpAddress").objects.filter().values():
-            if ip_address(self.ip_address) == ip_address(ipaddr["ip_address"]):
-                raise ValidationError({'ip_address': _('IP address already used.')})
+            if self.id != ipaddr["id"]:
+                if ip_address(self.ip_address) == ip_address(ipaddr["ip_address"]):
+                    raise ValidationError({'ip_address': _('IP address already used.')})

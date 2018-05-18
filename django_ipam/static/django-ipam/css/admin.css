@@ -1,0 +1,16 @@
+.list_ips{
+  padding: 10px;
+}
+
+.subnet_visual{
+  text-align:justify;
+}
+
+.subnet_visual li{
+  display:inline;
+  font-weight: bold;
+}
+
+.subnet_visual li .used{
+  color: red;
+}

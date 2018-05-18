@@ -23,6 +23,6 @@ class CreateModelsMixin:
 
 
 @skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
-class TestModel(BaseTestModel, TestCase, CreateModelsMixin):
+class TestModel(BaseTestModel, CreateModelsMixin, TestCase):
     ipaddress_model = IpAddress
     subnet_model = Subnet

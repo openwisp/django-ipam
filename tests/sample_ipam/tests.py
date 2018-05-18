@@ -9,16 +9,16 @@ IpAddress = swapper.load_model("django_ipam", "IpAddress")
 Subnet = swapper.load_model("django_ipam", "Subnet")
 
 
-class TestModel(TestCase, BaseTestModel, CreateModelsMixin):
+class TestModel(BaseTestModel, CreateModelsMixin, TestCase):
     ipaddress_model = IpAddress
     subnet_model = Subnet
 
 
-class TestAdmin(TestCase, BaseTestAdmin):
+class TestAdmin(BaseTestAdmin, TestCase):
     app_name = 'django_ipam'
     subnet_model = Subnet
     ipaddress_model = IpAddress
 
 
-class TestForms(TestCase, BaseTestForms):
+class TestForms(BaseTestForms, TestCase):
     form_class = NetworkAddressTestModelForm

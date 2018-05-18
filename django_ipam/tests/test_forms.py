@@ -16,5 +16,5 @@ class NetworkAddressTestModelForm(ModelForm):
 
 
 @skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
-class TestForms(TestCase, BaseTestForms):
+class TestForms(BaseTestForms, TestCase):
     form_class = NetworkAddressTestModelForm

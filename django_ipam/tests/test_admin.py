@@ -9,7 +9,7 @@ from .base.test_admin import BaseTestAdmin
 
 
 @skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
-class TestAdmin(TestCase, BaseTestAdmin):
+class TestAdmin(BaseTestAdmin, TestCase):
     app_name = 'django_ipam'
     subnet_model = Subnet
     ipaddress_model = IpAddress
