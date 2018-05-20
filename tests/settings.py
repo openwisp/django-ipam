@@ -32,13 +32,13 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'openwisp_utils.admin_theme',
-    'django.contrib.admin',
+    'django_ipam',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_ipam'
+    'django.contrib.admin',
 ]
 
 MIDDLEWARE = [
