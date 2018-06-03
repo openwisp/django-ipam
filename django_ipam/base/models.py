@@ -54,3 +54,21 @@ class AbstractIpAddress(TimeStampedEditableModel):
         for ipaddr in swapper.load_model("django_ipam", "IpAddress").objects.filter().values():
             if ip_address(self.ip_address) == ip_address(ipaddr["ip_address"]):
                 raise ValidationError({'ip_address': _('IP address already used.')})
+
+
+class AbstractIpRequest(TimeStampedEditableModel):
+    ip_address = models.GenericIPAddressField()
+    subnet = models.ForeignKey(swapper.get_model_name("django_ipam", "Subnet"),
+                               on_delete=models.CASCADE)
+    requester = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                  on_delete=models.CASCADE,
+                                  blank=True,
+                                  null=True)
+    description = models.CharField(max_length=100, blank=True)
+    accepted = models.BooleanField(default=False)
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return self.ip_address
