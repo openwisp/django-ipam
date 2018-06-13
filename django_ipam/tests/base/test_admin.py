@@ -50,6 +50,19 @@ class BaseTestAdmin(object):
         self.assertContains(response, 'ok')
         self.assertContains(response, '<h3>Used IP address</h3>')
 
+    def test_subnet_popup_response(self):
+        subnet = self.subnet_model(subnet="fdb6:21b:a477::9f7/64", description="Sample Subnet")
+        subnet.full_clean()
+        subnet.save()
+
+        ipaddr = self.ipaddress_model(ip_address="fdb6:21b:a477::9f7", subnet=subnet)
+        ipaddr.full_clean()
+        ipaddr.save()
+
+        response = self.client.get('/admin/django_ipam/subnet/{0}/change/?_popup=1'.format(subnet.id),
+                                   follow=True)
+        self.assertContains(response, 'ok')
+
     def test_ipaddress_response(self):
         subnet = self.subnet_model(subnet="10.0.0.0/24", description="Sample Subnet")
         subnet.full_clean()

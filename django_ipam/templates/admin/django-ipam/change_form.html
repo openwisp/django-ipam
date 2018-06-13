@@ -4,7 +4,7 @@
 
 {% block after_related_objects %}
   <div id="graph"></div>
-  {% if total %}
+  {% if show_visual %}
   <div>
     <h3>Subnet Visual Display</h3>
     <ul class="subnet-visual">
@@ -28,6 +28,7 @@
   </div>
   {% else %}
   <div class="list-ip">
+    {% if used_ip|length != 0 %}
     <h3>Used IP address</h3>
     <ul class="subnet-visual">
       {% for ipaddr in used_ip %}
@@ -39,6 +40,7 @@
       </li>
       {% endfor %}
     </ul>
+    {% endif %}
   </div>
   {% endif %}
 {% endblock %}
@@ -51,11 +53,11 @@
         layout = {}
     data = [
       {
-        values: {{values|safe}},
-        labels: {{labels|safe}},
+        values: {{ values|safe }},
+        labels: {{ labels|safe }},
         type: 'pie',
         hoverinfo: 'label+value',
-        textinfo: 'value',
+        textinfo: 'percent',
         marker: {
           colors: [
             'rgba(149, 10, 10, 1)',

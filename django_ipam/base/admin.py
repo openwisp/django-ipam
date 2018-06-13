@@ -14,7 +14,10 @@ class AbstractSubnetAdmin(TimeReadonlyAdminMixin, ModelAdmin):
 
     def change_view(self, request, object_id, form_url="", extra_context=None):
         instance = Subnet.objects.get(pk=object_id)
+        if request.GET.get('_popup'):
+            return super(AbstractSubnetAdmin, self).change_view(request, object_id, form_url, extra_context)
         if type(instance.subnet) == IPv4Network:
+            show_visual = True
             total = [host for host in instance.subnet.hosts()]
             used = len(list(instance.ipaddress_set.all()))
             used_ip = [ip_address(ip.ip_address) for ip in instance.ipaddress_set.all()]
@@ -25,10 +28,17 @@ class AbstractSubnetAdmin(TimeReadonlyAdminMixin, ModelAdmin):
                              'values': values,
                              'total': total,
                              'subnet': instance,
-                             'used_ip': used_ip}
+                             'used_ip': used_ip,
+                             'show_visual': show_visual}
         elif type(instance.subnet) == IPv6Network:
             used_ip = [ip for ip in instance.ipaddress_set.all()]
-            extra_context = {'used_ip': used_ip}
+            used = len(used_ip)
+            available = 2 ** (128 - instance.subnet.prefixlen) - used
+            labels = ['Used', 'Available']
+            values = [used, available]
+            extra_context = {'labels': labels,
+                             'values': values,
+                             'used_ip': used_ip}
 
         return super(AbstractSubnetAdmin, self).change_view(request, object_id, form_url, extra_context)
 
@@ -40,7 +50,7 @@ class AbstractSubnetAdmin(TimeReadonlyAdminMixin, ModelAdmin):
 class AbstractIpAddressAdmin(TimeReadonlyAdminMixin, ModelAdmin):
     def response_add(self, request, obj, post_url_continue='../%s/'):
         '''
-            Custom reponse to dismiss an add form popup for IP address.
+        Custom reponse to dismiss an add form popup for IP address.
         '''
         resp = super(AbstractIpAddressAdmin, self).response_add(request, obj, post_url_continue)
         if request.POST.get("_popup"):

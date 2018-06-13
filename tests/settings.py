@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'openwisp_utils.admin_theme',
     'django_ipam',
     'django.contrib.admin',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
