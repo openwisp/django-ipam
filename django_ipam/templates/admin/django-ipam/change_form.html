@@ -3,42 +3,44 @@
 {% load static %}
 
 {% block after_related_objects %}
-    <li style="list-style-type:none">
-      <div id="graph"></div>
-      {% if total %}
-        <div>
-          <h3>Subnet Visual Display</h3>
-          <ul class="subnet_visual">
-            {% for ipaddr in total %}
-              {% if ipaddr in used_ip %}
-                <li>
-                  <a class="used">
-                    {{ ipaddr }}
-                  </a>
-                </li>
-              {% else %}
-                <li>
-                  <a href="/admin/django_ipam/ipaddress/add/?_to_field=id&amp;_popup=1&amp;ip_address={{ ipaddr }}&amp;subnet={{ subnet.id }}" onclick='return showAddAnotherPopup(this);'>
-                    {{ ipaddr }}
-                  </a>
-                </li>
-              {% endif %}
-            {% endfor %}
-          </ul>
-        </div>
-      {% else %}
-        <div class="list_ips">
-          <h3>Used IP address</h3>
-          <ul class="subnet_visual">
-            {% for ipaddr in used_ip %}
-            <li>
-              <a class="used" href="/admin/django_ipam/ipaddress/{{ ipaddr.id }}/change" onclick='return showAddAnotherPopup(this);'>{{ ipaddr }}</a>
-            </li>
-            {% endfor %}
-          </ul>
-        </div>
-      {% endif %}
-    </li>
+  <div id="graph"></div>
+  {% if total %}
+  <div>
+    <h3>Subnet Visual Display</h3>
+    <ul class="subnet-visual">
+      {% for ipaddr in total %}
+        {% if ipaddr in used_ip %}
+          <li>
+            <a class="used">
+              {{ ipaddr }}
+            </a>
+          </li>
+        {% else %}
+          <li>
+            <a href="{% url 'admin:django_ipam_ipaddress_add' %}?_to_field=id&amp;_popup=1&amp;ip_address={{ ipaddr }}&amp;subnet={{ subnet.id }}"
+               onclick="return showAddAnotherPopup(this);">
+              {{ ipaddr }}
+            </a>
+          </li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  </div>
+  {% else %}
+  <div class="list-ip">
+    <h3>Used IP address</h3>
+    <ul class="subnet-visual">
+      {% for ipaddr in used_ip %}
+      <li>
+        <a class="used" href="{% url 'admin:django_ipam_ipaddress_change' ipaddr.id %}"
+           onclick="return showAddAnotherPopup(this);">
+           {{ ipaddr }}
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
 {% endblock %}
 
 {% block admin_change_form_document_ready %}
@@ -54,10 +56,15 @@
         type: 'pie',
         hoverinfo: 'label+value',
         textinfo: 'value',
-        marker: {colors: ['rgba(0, 0, 0, 0.65)', 'rgba(100, 1, 1, 0.65)']},
+        marker: {
+          colors: [
+            'rgba(149, 10, 10, 1)',
+            'rgba(20, 102, 26, 1)'
+          ]
+        },
         textfont: {
             size: 18,
-            color: '#FAFAFA',
+            color: '#FFF',
         }
       }
     ];
