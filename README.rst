@@ -44,6 +44,8 @@ Dependencies
 
     Python 3.4 or greater
 
+------------
+
 Install Development Version
 ===========================
 
@@ -54,6 +56,34 @@ Install the development version using the following commands:
     git clone https://github.com/openwisp/django-ipam.git
     cd django-ipam
     python setup.py develop
+
+Launch the development sever:
+
+.. code-block:: shell
+
+    cd tests/
+    ./manage.py migrate
+    ./manage.py createsuperuser
+    ./manage.py runserver
+
+You can access the admin interface at `http://127.0.0.1:8000/admin/`.
+
+------------
+
+Run Tests
+=========
+
+Install test requirements:
+
+.. code-block:: shell
+
+    pip install -r requirements-test.txt
+
+Then run the test suite:
+
+.. code-block:: shell
+
+    ./runtests.py
 
 ------------
 
@@ -88,13 +118,6 @@ Then run:
     ./manage.py migrate
 
 ------------
-
-Run Tests
-=========
-
-.. code-block:: shell
-
-    ./runtests.py
 
 `Support channels <http://openwisp.org/support.html>`_ |
 `Issue Tracker <https://github.com/openwisp/django-ipam/issues>`_ |
