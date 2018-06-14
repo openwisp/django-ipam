@@ -1,0 +1,78 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls %}
+{% load static %}
+
+{% block after_related_objects %}
+  <div id="graph"></div>
+  {% if show_visual %}
+  <div>
+    <h3>Subnet Visual Display</h3>
+    <ul class="subnet-visual">
+      {% for ipaddr in total %}
+        {% if ipaddr in used_ip %}
+          <li>
+            <a class="used">
+              {{ ipaddr }}
+            </a>
+          </li>
+        {% else %}
+          <li>
+            <a href="{% url 'admin:django_ipam_ipaddress_add' %}?_to_field=id&amp;_popup=1&amp;ip_address={{ ipaddr }}&amp;subnet={{ subnet.id }}"
+               onclick="return showAddAnotherPopup(this);">
+              {{ ipaddr }}
+            </a>
+          </li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  </div>
+  {% else %}
+  <div class="list-ip">
+    {% if used_ip|length != 0 %}
+    <h3>Used IP address</h3>
+    <ul class="subnet-visual">
+      {% for ipaddr in used_ip %}
+      <li>
+        <a class="used" href="{% url 'admin:django_ipam_ipaddress_change' ipaddr.id %}"
+           onclick="return showAddAnotherPopup(this);">
+           {{ ipaddr }}
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </div>
+  {% endif %}
+{% endblock %}
+
+{% block admin_change_form_document_ready %}
+  {{ block.super }}
+  <script type="text/javascript" src="{% static 'django-ipam/js/minified/plotly.min.js' %}"></script>
+  <script type="text/javascript">
+    var data = [],
+        layout = {}
+    data = [
+      {
+        values: {{ values|safe }},
+        labels: {{ labels|safe }},
+        type: 'pie',
+        hoverinfo: 'label+value',
+        textinfo: 'percent',
+        marker: {
+          colors: [
+            'rgba(149, 10, 10, 1)',
+            'rgba(20, 102, 26, 1)'
+          ]
+        },
+        textfont: {
+            size: 18,
+            color: '#FFF',
+        }
+      }
+    ];
+    layout = {
+      title: "Subnet Freespace Display"
+    };
+    Plotly.newPlot('graph', data, layout);
+  </script>
+{% endblock %}

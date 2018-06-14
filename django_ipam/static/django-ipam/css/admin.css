@@ -1,0 +1,44 @@
+.list-ip{
+  padding: 10px;
+}
+
+.subnet-visual{
+  text-align: justify;
+  margin: 10px 0 0;
+  padding: 0;
+}
+
+.subnet-visual li{
+  display: inline;
+  font-weight: bold;
+}
+
+.subnet-visual a {
+  display: inline-block;
+  width: 100px;
+  text-align: center;
+  padding: 5px 0;
+  margin: 0 0 10px 0;
+  border-radius: 0;
+  color: #fff;
+  background: rgba(20, 102, 26, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  font-weight: normal;
+}
+
+.subnet-visual a:hover{
+  background: rgba(20, 102, 26, 1);
+  border: 1px solid rgba(0, 0, 0, 0.4);
+}
+
+.subnet-visual li a.used{
+  background: rgba(149, 10, 10, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  font-weight: bold;
+  cursor: default;
+}
+
+.subnet-visual li a.used:hover{
+  background: rgba(149, 10, 10, 1);
+  border: 1px solid rgba(0, 0, 0, 0.4);
+}

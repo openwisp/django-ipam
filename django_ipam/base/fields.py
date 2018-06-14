@@ -26,7 +26,7 @@ class IpNetworkFormField(forms.Field):
             value = value.strip()
 
         try:
-            network = ip_network(value)
+            network = ip_network(value, strict=False)
         except ValueError as e:
             raise ValidationError(self.default_error_messages['invalid'])
         return network
@@ -50,7 +50,7 @@ class NetworkField(models.Field):
         if not value:
             return value
         try:
-            return ip_network(value)
+            return ip_network(value, strict=False)
         except ValueError as e:
             raise ValidationError(e)
 

@@ -14,6 +14,8 @@ before_install:
   - pip install --no-cache-dir -U -r requirements-test.txt
   - ./runflake8
   - ./runisort
+  - npm install -g jslint
+  - jslint ./django_ipam/static/django-ipam/js/*.js
 
 install:
   - pip install "django>=2.0,<2.1"
