@@ -50,13 +50,16 @@
   <script type="text/javascript" src="{% static 'django-ipam/js/minified/plotly.min.js' %}"></script>
   <script type="text/javascript">
     var data = [],
-        layout = {}
+        layout = {},
+        vals = {{ values|safe }}
+    vals[1] = Number(vals[1]);
     data = [
       {
         values: {{ values|safe }},
         labels: {{ labels|safe }},
+        text: vals,
         type: 'pie',
-        hoverinfo: 'label+value',
+        hoverinfo: 'label+text',
         textinfo: 'percent',
         marker: {
           colors: [
