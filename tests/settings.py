@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django_ipam',
     'django.contrib.admin',
     'django_extensions',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
