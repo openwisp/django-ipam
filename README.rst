@@ -119,6 +119,27 @@ Then run:
 
 ------------
 
+RESTful API
+===========
+
+IP Request
+##########
+
+A model method to fetch the next available IP address under a specific subnet. This method can also be accessed via a RESTful API.
+
+`django_ipam/base/models.py <https://github.com/openwisp/django-ipam/blob/master/django_ipam/base/models.py#L37>`_
+
+POST
+++++
+Returns the next available IP address under a subnet.
+
+.. code-block:: text
+
+    /api/v1/subnet/<subnet_id>/request-ip/
+
+
+------------
+
 `Support channels <http://openwisp.org/support.html>`_ |
 `Issue Tracker <https://github.com/openwisp/django-ipam/issues>`_ |
 `License <https://github.com/openwisp/django-ipam/blob/master/LICENSE>`_ |

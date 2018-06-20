@@ -4,6 +4,7 @@ import swapper
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 from openwisp_utils.base import TimeStampedEditableModel
 
@@ -32,6 +33,14 @@ class AbstractSubnet(TimeStampedEditableModel):
         for subnet in swapper.load_model("django_ipam", "Subnet").objects.filter().values():
             if self.id != subnet["id"] and ip_network(self.subnet).overlaps(subnet["subnet"]):
                 raise ValidationError({'subnet': _('Subnet overlaps with %s') % (subnet["subnet"])})
+
+    def request_ip(self):
+        subnet = get_object_or_404(swapper.load_model("django_ipam", "Subnet"), pk=self.id)
+        ipaddress_set = [ipaddr.ip_address for ipaddr in subnet.ipaddress_set.all()]
+        for host in subnet.subnet.hosts():
+            if str(host) not in ipaddress_set:
+                return str(host)
+        return None
 
 
 class AbstractIpAddress(TimeStampedEditableModel):
