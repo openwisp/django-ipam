@@ -49,9 +49,9 @@ class AbstractSubnetAdmin(TimeReadonlyAdminMixin, ModelAdmin):
 
 class AbstractIpAddressAdmin(TimeReadonlyAdminMixin, ModelAdmin):
     def response_add(self, request, obj, post_url_continue='../%s/'):
-        '''
+        """
         Custom reponse to dismiss an add form popup for IP address.
-        '''
+        """
         resp = super(AbstractIpAddressAdmin, self).response_add(request, obj, post_url_continue)
         if request.POST.get("_popup"):
             return HttpResponse('''
