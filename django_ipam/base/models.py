@@ -55,10 +55,10 @@ class AbstractSubnet(TimeStampedEditableModel):
 
 
 class AbstractIpAddress(TimeStampedEditableModel):
-    ip_address = models.GenericIPAddressField()
-    description = models.CharField(max_length=100, blank=True)
     subnet = models.ForeignKey(swapper.get_model_name("django_ipam", "Subnet"),
                                on_delete=models.CASCADE)
+    ip_address = models.GenericIPAddressField()
+    description = models.CharField(max_length=100, blank=True)
 
     class Meta:
         abstract = True
@@ -69,6 +69,6 @@ class AbstractIpAddress(TimeStampedEditableModel):
     def clean(self):
         if self.subnet_id and ip_address(self.ip_address) not in self.subnet.subnet:
             raise ValidationError({'ip_address': _('IP address does not belong to the subnet')})
-        for ipaddr in swapper.load_model("django_ipam", "IpAddress").objects.filter().values():
-            if self.id != ipaddr["id"] and ip_address(self.ip_address) == ip_address(ipaddr["ip_address"]):
+        for ip in swapper.load_model("django_ipam", "IpAddress").objects.filter().values():
+            if self.id != ip["id"] and ip_address(self.ip_address) == ip_address(ip["ip_address"]):
                 raise ValidationError({'ip_address': _('IP address already used.')})

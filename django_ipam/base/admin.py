@@ -1,8 +1,11 @@
 from ipaddress import IPv4Network, IPv6Network, ip_address
 
 import swapper
+from django import forms
 from django.contrib.admin import ModelAdmin
 from django.http import HttpResponse
+from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from openwisp_utils.admin import TimeReadonlyAdminMixin
 
 Subnet = swapper.load_model("django_ipam", "Subnet")
@@ -10,7 +13,7 @@ IpAddress = swapper.load_model("django_ipam", "IpAddress")
 
 
 class AbstractSubnetAdmin(TimeReadonlyAdminMixin, ModelAdmin):
-    change_form_template = "admin/django-ipam/change_form.html"
+    change_form_template = "admin/django-ipam/subnet/change_form.html"
 
     def change_view(self, request, object_id, form_url="", extra_context=None):
         instance = Subnet.objects.get(pk=object_id)
@@ -47,7 +50,32 @@ class AbstractSubnetAdmin(TimeReadonlyAdminMixin, ModelAdmin):
         css = {'all': ('django-ipam/css/admin.css',)}
 
 
+class IpAddressAdminForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(IpAddressAdminForm, self).__init__(*args, **kwargs)
+        self.fields["subnet"].help_text = _('Select a subnet and the first available IP address '
+                                            'will be automatically suggested in the ip address field')
+
+
 class AbstractIpAddressAdmin(TimeReadonlyAdminMixin, ModelAdmin):
+    form = IpAddressAdminForm
+    change_form_template = "admin/django-ipam/ip_address/change_form.html"
+
+    class Media:
+        js = ('django-ipam/js/ip-request.js',)
+
+    def get_extra_context(self):
+        return {'get_first_available_ip_url': reverse('ipam:get_first_available_ip', args=('0000',))}
+
+    def add_view(self, request, form_url='', extra_context=None):
+        return super(AbstractIpAddressAdmin, self).add_view(request, form_url, self.get_extra_context())
+
+    def change_view(self, request, object_id, form_url="", extra_context=None):
+        return super(AbstractIpAddressAdmin, self).change_view(request,
+                                                               object_id,
+                                                               form_url,
+                                                               self.get_extra_context())
+
     def response_add(self, request, obj, post_url_continue='../%s/'):
         """
         Custom reponse to dismiss an add form popup for IP address.
