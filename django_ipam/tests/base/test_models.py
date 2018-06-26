@@ -47,6 +47,25 @@ class BaseTestModel(CreateModelsMixin):
         if failed:
             self.fail('ValidationError not raised')
 
+    def test_available_ipv4(self):
+        subnet = self._create_subnet(dict(subnet='10.0.0.0/24'))
+        self._create_ipaddress(dict(ip_address='10.0.0.1',
+                                    subnet=subnet))
+        ipaddr = subnet.get_first_available_ip()
+        self.assertEqual(str(ipaddr), '10.0.0.2')
+
+    def test_available_ipv6(self):
+        subnet = self._create_subnet(dict(subnet='fdb6:21b:a477::9f7/64'))
+        self._create_ipaddress(dict(ip_address='fdb6:21b:a477::1',
+                                    subnet=subnet))
+        ipaddr = subnet.get_first_available_ip()
+        self.assertEqual(str(ipaddr), 'fdb6:21b:a477::2')
+
+    def test_unavailable_ip(self):
+        subnet = self._create_subnet(dict(subnet='10.0.0.0/32'))
+        ipaddr = subnet.get_first_available_ip()
+        self.assertEqual(ipaddr, None)
+
     def test_request_ipv4(self):
         subnet = self._create_subnet(dict(subnet='10.0.0.0/24'))
         self._create_ipaddress(dict(ip_address='10.0.0.1',
@@ -60,6 +79,11 @@ class BaseTestModel(CreateModelsMixin):
                                     subnet=subnet))
         ipaddr = subnet.request_ip()
         self.assertEqual(str(ipaddr), 'fdb6:21b:a477::2')
+
+    def test_unavailable_request_ip(self):
+        subnet = self._create_subnet(dict(subnet='10.0.0.0/32'))
+        ipaddr = subnet.request_ip()
+        self.assertEqual(ipaddr, None)
 
     def test_subnet_string_representation(self):
         subnet = self.subnet_model(subnet='entry subnet')

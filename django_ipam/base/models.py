@@ -1,10 +1,8 @@
 from ipaddress import ip_address, ip_network
 
 import swapper
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 from openwisp_utils.base import TimeStampedEditableModel
 
@@ -34,12 +32,25 @@ class AbstractSubnet(TimeStampedEditableModel):
             if self.id != subnet["id"] and ip_network(self.subnet).overlaps(subnet["subnet"]):
                 raise ValidationError({'subnet': _('Subnet overlaps with %s') % (subnet["subnet"])})
 
-    def request_ip(self):
-        subnet = get_object_or_404(swapper.load_model("django_ipam", "Subnet"), pk=self.id)
-        ipaddress_set = [ipaddr.ip_address for ipaddr in subnet.ipaddress_set.all()]
-        for host in subnet.subnet.hosts():
+    def get_first_available_ip(self):
+        ipaddress_set = [ip.ip_address for ip in self.ipaddress_set.all()]
+        for host in self.subnet.hosts():
             if str(host) not in ipaddress_set:
                 return str(host)
+        return None
+
+    def request_ip(self, options=None):
+        if options is None:
+            options = {}
+        ip = self.get_first_available_ip()
+        if ip:
+            ip_address = swapper.load_model("django_ipam", "IpAddress")(
+                                            ip_address=ip,
+                                            subnet=self,
+                                            **options)
+            ip_address.full_clean()
+            ip_address.save()
+            return ip_address
         return None
 
 
@@ -48,10 +59,6 @@ class AbstractIpAddress(TimeStampedEditableModel):
     description = models.CharField(max_length=100, blank=True)
     subnet = models.ForeignKey(swapper.get_model_name("django_ipam", "Subnet"),
                                on_delete=models.CASCADE)
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL,
-                              on_delete=models.CASCADE,
-                              blank=True,
-                              null=True)
 
     class Meta:
         abstract = True

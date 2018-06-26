@@ -122,21 +122,51 @@ Then run:
 RESTful API
 ===========
 
-IP Request
-##########
+Get First Available IP
+######################
 
 A model method to fetch the next available IP address under a specific subnet. This method can also be accessed via a RESTful API.
 
-`django_ipam/base/models.py <https://github.com/openwisp/django-ipam/blob/master/django_ipam/base/models.py#L37>`_
+`django_ipam/base/models.py <https://github.com/openwisp/django-ipam/blob/master/django_ipam/base/models.py#L35>`_
 
-POST
+GET
 ++++
 Returns the next available IP address under a subnet.
 
 .. code-block:: text
 
-    /api/v1/subnet/<subnet_id>/request-ip/
+    /api/v1/subnet/<subnet_id>/get-first-available-ip/
 
+Request IP
+##########
+
+A model method to create and fetch the next available IP address record under a subnet.
+
+POST
+++++
+Creates a record for next available IP address and returns JSON data of that record.
+
+.. code-block:: text
+
+    POST /api/v1/subnet/<subnet_id>/request-ip/
+
+===========    ========================================
+Param          Description
+===========    ========================================
+description    Optional description for the IP address
+===========    ========================================
+
+Response
+++++++++
+
+.. code-block:: json
+
+
+    {
+        "ip_address": "ip_address",
+        "subnet": "subnet_uuid",
+        "description": "optional description"
+    }
 
 ------------
 
