@@ -47,6 +47,19 @@ class BaseTestModel(CreateModelsMixin):
         if failed:
             self.fail('ValidationError not raised')
 
+    def test_invalid_ipaddress(self):
+        failed = True
+        error_message = "'1234325' does not appear to be an IPv4 or IPv6 address"
+        self._create_subnet(dict(subnet='10.0.0.0/24'))
+        try:
+            self._create_ipaddress(dict(ip_address='1234325',
+                                        subnet=self.subnet_model.objects.first()))
+        except ValueError as e:
+            self.assertEqual(str(e), error_message)
+            failed = False
+        if failed:
+            self.fail('ValueError not raised')
+
     def test_available_ipv4(self):
         subnet = self._create_subnet(dict(subnet='10.0.0.0/24'))
         self._create_ipaddress(dict(ip_address='10.0.0.1',

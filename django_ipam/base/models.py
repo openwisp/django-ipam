@@ -28,6 +28,8 @@ class AbstractSubnet(TimeStampedEditableModel):
         return str(self.subnet)
 
     def clean(self):
+        if not self.subnet:
+            return
         for subnet in swapper.load_model("django_ipam", "Subnet").objects.filter().values():
             if self.id != subnet["id"] and ip_network(self.subnet).overlaps(subnet["subnet"]):
                 raise ValidationError({'subnet': _('Subnet overlaps with %s') % (subnet["subnet"])})
@@ -67,6 +69,8 @@ class AbstractIpAddress(TimeStampedEditableModel):
         return self.ip_address
 
     def clean(self):
+        if not self.ip_address:
+            return
         if self.subnet_id and ip_address(self.ip_address) not in self.subnet.subnet:
             raise ValidationError({'ip_address': _('IP address does not belong to the subnet')})
         for ip in swapper.load_model("django_ipam", "IpAddress").objects.filter().values():

@@ -11,6 +11,23 @@ class BaseTestAdmin(CreateModelsMixin):
                                       email='admin@admin.com')
         self.client.login(username='admin', password='tester')
 
+    def test_ipaddress_invalid_entry(self):
+        subnet = self._create_subnet(dict(subnet="10.0.0.0/24", description="Sample Subnet"))
+
+        post_data = {
+            'ip_address': "12344",
+            'subnet': subnet.id,
+            'created_0': '2017-08-08',
+            'created_1': '15:16:10',
+            'modified_0': '2017-08-08',
+            'modified_1': '15:16:10',
+        }
+
+        response = self.client.post(reverse('admin:{0}_ipaddress_add'.format(self.app_name)),
+                                    post_data, follow=True)
+        self.assertContains(response, 'ok')
+        self.assertContains(response, 'Enter a valid IPv4 or IPv6 address.')
+
     def test_ipaddress_change(self):
         subnet = self._create_subnet(dict(subnet="10.0.0.0/24", description="Sample Subnet"))
         obj = self._create_ipaddress(dict(ip_address="10.0.0.1", subnet=subnet))
@@ -38,6 +55,21 @@ class BaseTestAdmin(CreateModelsMixin):
         self.assertContains(response, 'ok')
         self.assertContains(response, '<h3>Used IP address</h3>')
 
+    def test_subnet_invalid_entry(self):
+
+        post_data = {
+            'subnet': "12344",
+            'created_0': '2017-08-08',
+            'created_1': '15:16:10',
+            'modified_0': '2017-08-08',
+            'modified_1': '15:16:10',
+        }
+
+        response = self.client.post(reverse('admin:{0}_subnet_add'.format(self.app_name)),
+                                    post_data, follow=True)
+        self.assertContains(response, 'ok')
+        self.assertContains(response, 'Enter a valid CIDR address.')
+
     def test_subnet_popup_response(self):
         subnet = self._create_subnet(dict(subnet="fdb6:21b:a477::9f7/64", description="Sample Subnet"))
         self._create_ipaddress(dict(ip_address="fdb6:21b:a477::9f7", subnet=subnet))
@@ -57,7 +89,7 @@ class BaseTestAdmin(CreateModelsMixin):
             'modified_0': '2017-08-08',
             'modified_1': '15:16:10',
         }
-        response = self.client.post("/admin/django_ipam/ipaddress/add/",
+        response = self.client.post(reverse('admin:{0}_ipaddress_add'.format(self.app_name)),
                                     post_data, follow=True)
         self.assertContains(response, 'ok')
 
@@ -73,6 +105,6 @@ class BaseTestAdmin(CreateModelsMixin):
             'modified_1': '15:16:10',
             '_popup': '1',
         }
-        response = self.client.post("/admin/django_ipam/ipaddress/add/",
+        response = self.client.post(reverse('admin:{0}_ipaddress_add'.format(self.app_name)),
                                     post_data)
         self.assertContains(response, 'opener.dismissAddAnotherPopup(window);')
