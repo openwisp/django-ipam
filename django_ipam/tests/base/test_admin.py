@@ -13,7 +13,6 @@ class BaseTestAdmin(CreateModelsMixin):
 
     def test_ipaddress_invalid_entry(self):
         subnet = self._create_subnet(dict(subnet="10.0.0.0/24", description="Sample Subnet"))
-
         post_data = {
             'ip_address': "12344",
             'subnet': subnet.id,
@@ -22,7 +21,6 @@ class BaseTestAdmin(CreateModelsMixin):
             'modified_0': '2017-08-08',
             'modified_1': '15:16:10',
         }
-
         response = self.client.post(reverse('admin:{0}_ipaddress_add'.format(self.app_name)),
                                     post_data, follow=True)
         self.assertContains(response, 'ok')
@@ -80,7 +78,6 @@ class BaseTestAdmin(CreateModelsMixin):
 
     def test_ipaddress_response(self):
         subnet = self._create_subnet(dict(subnet="10.0.0.0/24", description="Sample Subnet"))
-
         post_data = {
             'ip_address': "10.0.0.1",
             'subnet': subnet.id,
@@ -95,7 +92,6 @@ class BaseTestAdmin(CreateModelsMixin):
 
     def test_ipaddress_popup_response(self):
         subnet = self._create_subnet(dict(subnet="10.0.0.0/24", description="Sample Subnet"))
-
         post_data = {
             'ip_address': "10.0.0.1",
             'subnet': subnet.id,

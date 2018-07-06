@@ -29,16 +29,17 @@
             ip_address = $('.field-ip_address'),
             description = $('.field-description');
         subnet.change(function (e) {
-            if (getURLParameter('_popup') !== '1') {
-                if (subnet.val() === '') {
-                    ip_address.hide();
-                    description.hide();
-                } else {
-                    ip_address.show();
-                    description.show();
-                    if (window.location.pathname.indexOf('change') === -1) {
-                        getAvailableIp();
-                    }
+            if (getURLParameter('_popup') === '1') {
+                return;
+            }
+            if (subnet.val() === '') {
+                ip_address.hide();
+                description.hide();
+            } else {
+                ip_address.show();
+                description.show();
+                if (window.location.pathname.indexOf('change') === -1) {
+                    getAvailableIp();
                 }
             }
         });
