@@ -11,7 +11,7 @@ django-ipam
 
 .. contents:: **Table of Contents**:
    :backlinks: none
-   :depth: 3
+   :depth: 2
 
 ------------
 
@@ -122,6 +122,16 @@ Then run:
 RESTful API
 ===========
 
+API Authentication
+##################
+
+The API authentication is based on session based authentication via Django REST framework.
+This authentication scheme uses Django's default session backend for authentication.
+
+.. code-block:: text
+
+    http -a username:password <HTTP verb> <api url>
+
 Get First Available IP
 ######################
 
@@ -130,7 +140,8 @@ A model method to fetch the next available IP address under a specific subnet. T
 `django_ipam/base/models.py <https://github.com/openwisp/django-ipam/blob/master/django_ipam/base/models.py#L35>`_
 
 GET
-++++
++++
+
 Returns the next available IP address under a subnet.
 
 .. code-block:: text
@@ -144,6 +155,7 @@ A model method to create and fetch the next available IP address record under a 
 
 POST
 ++++
+
 Creates a record for next available IP address and returns JSON data of that record.
 
 .. code-block:: text
@@ -167,6 +179,188 @@ Response
         "subnet": "subnet_uuid",
         "description": "optional description"
     }
+
+IpAddress-Subnet List and Create View
+#####################################
+
+An api enpoint to retrieve or create IP addresses under a specific subnet.
+
+GET
++++
+
+Returns the list of IP addresses under a particular subnet.
+
+.. code-block:: text
+
+    /api/v1/subnet/<subnet_id>/ip-address/
+
+POST
+++++
+
+Create a new ``IP Address``.
+
+.. code-block:: text
+
+    /api/v1/subnet/<subnet_id>/ip-address/
+
+===========    ========================================
+Param          Description
+===========    ========================================
+ip_address     IPv6/IPv4 address value
+subnet         Subnet UUID
+description    Optional description for the IP address
+===========    ========================================
+
+Subnet List/Create View
+#######################
+
+An api endpoint to create or retrieve the list of subnet instances.
+
+GET
++++
+
+Returns the list of ``Subnet`` instances.
+
+.. code-block:: text
+
+    /api/v1/subnet
+
+POST
+++++
+
+Create a new ``Subnet``.
+
+.. code-block:: text
+
+    /api/v1/subnet
+
+=============    ========================================
+Param            Description
+=============    ========================================
+subnet           Subnet value in CIDR format
+master_subnet    Master Subnet UUID
+description      Optional description for the IP address
+=============    ========================================
+
+Subnet View
+###########
+
+An api endpoint for retrieving, updating or deleting a subnet instance.
+
+GET
++++
+
+Get details of a ``Subnet`` instance
+
+.. code-block:: text
+
+    /api/v1/subnet/<subnet-id>
+
+DELETE
+++++++
+
+Delete a ``Subnet`` instance
+
+.. code-block:: text
+
+    /api/v1/subnet/<subnet-id>
+
+PUT
++++
+
+Update details of a ``Subnet`` instance.
+
+.. code-block:: text
+
+    /api/v1/subnet/<subnet-id>
+
+=============    ========================================
+Param            Description
+=============    ========================================
+subnet           Subnet value in CIDR format
+master_subnet    Master Subnet UUID
+description      Optional description for the IP address
+=============    ========================================
+
+IP Address View
+###############
+
+An api enpoint for retrieving, updating or deleting a IP address instance.
+
+GET
++++
+
+Get details of an ``IP address`` instance.
+
+.. code-block:: text
+
+    /api/v1/ip-address/<ip_address-id>
+
+DELETE
+++++++
+
+Delete an ``IP address`` instance.
+
+.. code-block:: text
+
+    /api/v1/ip-address/<ip_address-id>
+
+PUT
++++
+
+Update details of an ``IP address`` instance.
+
+.. code-block:: text
+
+    /api/v1/ip-address/<ip_address-id>
+
+===========    ========================================
+Param          Description
+===========    ========================================
+ip_address     IPv6/IPv4 value
+subnet         Subnet UUID
+description    Optional description for the IP address
+===========    ========================================
+
+------------
+
+Extending django-ipam
+=====================
+
+Extending API Views
+###################
+
+The base API view classes can be extended into other django applications.
+
+.. code-block:: python
+
+    # your app.api.views
+    from ..models import Subnet, IpAddress
+
+    from django_ipam.api.generics import (
+        BaseIpAddressListCreateView, BaseIpAddressView, BaseRequestIPView, BaseSubnetListCreateView,
+        BaseSubnetView,
+    )
+
+    class RequestIPView(BaseRequestIPView):
+        subnet_model = Subnet
+        queryset = IpAddress.objects.none()
+
+
+    class SubnetIpAddressListCreateView(BaseIpAddressListCreateView):
+        subnet_model = Subnet
+
+
+    class SubnetListCreateView(BaseSubnetListCreateView):
+        queryset = Subnet.objects.all()
+
+
+    class SubnetView(BaseSubnetView):
+        queryset = Subnet.objects.all()
+
+
+    class IpAddressView(BaseIpAddressView):
+        queryset = IpAddress.objects.all()
 
 ------------
 
