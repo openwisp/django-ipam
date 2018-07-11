@@ -322,6 +322,93 @@ subnet         Subnet UUID
 description    Optional description for the IP address
 ===========    ========================================
 
+Export Subnet View
+##################
+
+View to export subnet data.
+
+POST
+++++
+
+.. code-block:: text
+
+    /api/v1/subnet/<subnet-id>/export
+
+Import Subnet View
+##################
+
+View to import subnet data.
+
+POST
+++++
+
+.. code-block:: text
+
+    /api/v1/import-subnet
+
+------------
+
+Exporting and Importing Subnet
+==============================
+
+One can easily import and export `Subnet` data and it's Ip Addresses using `django-ipam`.
+
+Exporting
+#########
+
+Data can be exported via the admin interface or by using a management command. The exported data is in `.csv` file format.
+
+From management command
++++++++++++++++++++++++
+
+.. code-block:: shell
+
+    ./manage.py export_subnet <subnet value>
+
+This would export the subnet if it exists on the database.
+
+From admin interface
+++++++++++++++++++++
+
+Data can be exported from the admin interface by just clicking on the export button on the subnet's admin change view.
+
+.. image:: https://raw.githubusercontent.com/openwisp/django-ipam/master/docs/images/export.png
+
+Importing
+#########
+
+Data can be imported via the admin interface or by using a management command.
+The imported data file can be in `.csv`, `.xls` and `.xlsx` format.
+
+From management command
++++++++++++++++++++++++
+
+.. code-block:: shell
+
+    ./manage.py import_subnet --file=<file path>
+
+From admin interface
+++++++++++++++++++++
+
+Data can be imported from the admin interface by just clicking on the import button on the subnet view.
+
+.. image:: https://raw.githubusercontent.com/openwisp/django-ipam/master/docs/images/import.png
+
+CSV file format
++++++++++++++++
+
+Follow the following structure while creating `csv` file to import data.
+
+.. code-block:: text
+
+    Subnet Name
+    Subnet Value
+
+    ip_address,description
+    <ip-address>,<optional-description>
+    <ip-address>,<optional-description>
+    <ip-address>,<optional-description>
+
 ------------
 
 Extending django-ipam
@@ -355,12 +442,22 @@ The base API view classes can be extended into other django applications.
         queryset = Subnet.objects.all()
 
 
-    class SubnetView(BaseSubnetView):
+    class SubnetVew(BaseSubnetView):
         queryset = Subnet.objects.all()
 
 
     class IpAddressView(BaseIpAddressView):
         queryset = IpAddress.objects.all()
+
+
+    class ImportSubnetView(BaseImportSubnetView):
+        subnet_model = Subnet
+        queryset = Subnet.objects.none()
+
+
+    class ExportSubnetView(BaseExportSubnetView):
+        subnet_model = Subnet
+        queryset = Subnet.objects.none()
 
 ------------
 

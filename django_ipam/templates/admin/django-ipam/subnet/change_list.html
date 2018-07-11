@@ -1,0 +1,11 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls %}
+
+{% block object-tools-items %}
+<li>
+  <a href="{% url 'admin:import_ipaddress' %}">
+    {% trans "Import Subnet/IP Address" %}
+  </a>
+</li>
+{{ block.super }}
+{% endblock %}

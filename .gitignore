@@ -102,3 +102,6 @@ ENV/
 
 # database
 *.sqlite3
+
+# Generated CSV files
+data_*.csv

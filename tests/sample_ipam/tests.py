@@ -6,6 +6,7 @@ from django.test import TestCase
 
 from django_ipam.tests.test_admin import BaseTestAdmin
 from django_ipam.tests.test_api import BaseTestApi
+from django_ipam.tests.test_commands import BaseTestCommands
 from django_ipam.tests.test_forms import BaseTestForms, NetworkAddressTestModelForm
 from django_ipam.tests.test_models import BaseTestModel
 
@@ -33,5 +34,11 @@ class TestForms(BaseTestForms, TestCase):
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django-ipam models')
 class TestApi(BaseTestApi, TestCase):
+    subnet_model = Subnet
+    ipaddress_model = IpAddress
+
+
+@skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django-ipam models')
+class TestCommands(BaseTestCommands, TestCase):
     subnet_model = Subnet
     ipaddress_model = IpAddress

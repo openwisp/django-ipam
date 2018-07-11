@@ -13,3 +13,7 @@ class IpAddress(AbstractIpAddress):
     class Meta(AbstractIpAddress.Meta):
         abstract = False
         swappable = swappable_setting('django_ipam', 'IpAddress')
+
+
+class CsvImportException(Exception):
+    pass

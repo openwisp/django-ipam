@@ -4,8 +4,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from .generics import (
-    BaseIpAddressListCreateView, BaseIpAddressView, BaseRequestIPView, BaseSubnetListCreateView,
-    BaseSubnetView,
+    BaseExportSubnetView, BaseImportSubnetView, BaseIpAddressListCreateView, BaseIpAddressView,
+    BaseRequestIPView, BaseSubnetListCreateView, BaseSubnetView,
 )
 
 IpAddress = swapper.load_model('django_ipam', 'IpAddress')
@@ -57,6 +57,24 @@ class IpAddressView(BaseIpAddressView):
     queryset = IpAddress.objects.all()
 
 
+class ImportSubnetView(BaseImportSubnetView):
+    """
+    View for importing a subnet from csv/xls/xlsx file.
+    """
+    subnet_model = Subnet
+    queryset = Subnet.objects.none()
+
+
+class ExportSubnetView(BaseExportSubnetView):
+    """
+    View for exporting a subnet to a csv file.
+    """
+    subnet_model = Subnet
+    queryset = Subnet.objects.none()
+
+
+import_subnet = ImportSubnetView.as_view()
+export_subnet = ExportSubnetView.as_view()
 request_ip = RequestIPView.as_view()
 subnet_list_create = SubnetListCreateView.as_view()
 subnet = SubnetView.as_view()

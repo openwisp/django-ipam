@@ -2,6 +2,20 @@
 {% load i18n admin_urls %}
 {% load static %}
 
+{% block object-tools-items %}
+<li>
+  <a href="{% url 'admin:export_ipaddress' subnet.id %}">
+    {% trans "Export" %}
+  </a>
+</li>
+<li>
+  <a href="{% url 'admin:import_ipaddress' %}">
+    {% trans "Import" %}
+  </a>
+</li>
+{{ block.super }}
+{% endblock %}
+
 {% block after_related_objects %}
   <div id="graph"></div>
   {% if show_visual %}
