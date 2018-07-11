@@ -1,12 +1,14 @@
 import swapper
 from django.shortcuts import get_object_or_404
-from rest_framework import status
 from rest_framework.decorators import api_view
-from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 
-from .serializers import IpAddressSerializer, IpRequestSerializer
+from .generics import (
+    BaseIpAddressListCreateView, BaseIpAddressView, BaseRequestIPView, BaseSubnetListCreateView,
+    BaseSubnetView,
+)
 
+IpAddress = swapper.load_model('django_ipam', 'IpAddress')
 Subnet = swapper.load_model('django_ipam', 'Subnet')
 
 
@@ -19,17 +21,44 @@ def get_first_available_ip(request, subnet_id):
     return Response(subnet.get_first_available_ip())
 
 
-class RequestIPView(CreateAPIView):
+class RequestIPView(BaseRequestIPView):
     """
     Request and create a record for the next available IP address under a subnet
     """
-    serializer_class = IpRequestSerializer
+    subnet_model = Subnet
+    queryset = IpAddress.objects.none()
 
-    def post(self, request, *args, **kwargs):
-        subnet = get_object_or_404(Subnet, pk=kwargs["subnet_id"])
-        ip_address = subnet.request_ip(dict(description=request.data.get("description")))
-        if ip_address:
-            serializer = IpAddressSerializer(ip_address)
-            headers = self.get_success_headers(serializer.data)
-            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-        return Response(None)
+
+class SubnetIpAddressListCreateView(BaseIpAddressListCreateView):
+    """
+    List/Create IP addresses under a specific subnet
+    """
+    subnet_model = Subnet
+
+
+class SubnetListCreateView(BaseSubnetListCreateView):
+    """
+    List/Create subnets
+    """
+    queryset = Subnet.objects.all()
+
+
+class SubnetView(BaseSubnetView):
+    """
+    View for retrieving, updating or deleting a subnet instance.
+    """
+    queryset = Subnet.objects.all()
+
+
+class IpAddressView(BaseIpAddressView):
+    """
+    View for retrieving, updating or deleting a IP address instance.
+    """
+    queryset = IpAddress.objects.all()
+
+
+request_ip = RequestIPView.as_view()
+subnet_list_create = SubnetListCreateView.as_view()
+subnet = SubnetView.as_view()
+ip_address = IpAddressView.as_view()
+subnet_list_ipaddress = SubnetIpAddressListCreateView.as_view()
