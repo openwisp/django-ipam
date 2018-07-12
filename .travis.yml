@@ -10,6 +10,11 @@ branches:
   only:
     - master
 
+env:
+  matrix:
+   - ''  # main tests
+   - SAMPLE_APP=1  # sample app tests
+
 before_install:
   - pip install --no-cache-dir -U -r requirements-test.txt
   - ./runflake8
