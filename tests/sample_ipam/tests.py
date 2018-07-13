@@ -21,7 +21,7 @@ class TestModel(BaseTestModel, TestCase):
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django-ipam models')
 class TestAdmin(BaseTestAdmin, TestCase):
-    app_name = 'django_ipam'
+    app_name = 'sample_ipam'
     subnet_model = Subnet
     ipaddress_model = IpAddress
 

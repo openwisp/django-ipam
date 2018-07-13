@@ -3,8 +3,6 @@ import json
 from django.contrib.auth.models import User
 from django.urls import reverse
 
-from django_ipam.models import IpAddress, Subnet
-
 from .base import CreateModelsMixin
 
 
@@ -78,7 +76,7 @@ class BaseTestApi(CreateModelsMixin):
                                     }),
                                     content_type='application/json')
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(str(Subnet.objects.first().subnet), '10.0.0.0/32')
+        self.assertEqual(str(self.subnet_model.objects.first().subnet), '10.0.0.0/32')
 
     def test_read_subnet_api(self):
         subnet_id = self._create_subnet(subnet="fdb6:21b:a477::/64").id
@@ -92,13 +90,13 @@ class BaseTestApi(CreateModelsMixin):
                                      data=json.dumps({'description': 'Test Subnet'}),
                                      content_type='application/json')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(Subnet.objects.get(pk=subnet_id).description, 'Test Subnet')
+        self.assertEqual(self.subnet_model.objects.get(pk=subnet_id).description, 'Test Subnet')
 
     def test_delete_subnet_api(self):
         subnet_id = self._create_subnet(subnet="10.0.0.0/32").id
         response = self.client.delete(reverse('ipam:subnet', args=(subnet_id,)))
         self.assertEqual(response.status_code, 204)
-        self.assertEqual(Subnet.objects.count(), 0)
+        self.assertEqual(self.subnet_model.objects.count(), 0)
 
     def test_create_ip_address_api(self):
         subnet_id = self._create_subnet(subnet="10.0.0.0/24").id
@@ -110,7 +108,7 @@ class BaseTestApi(CreateModelsMixin):
                                     }),
                                     content_type='application/json')
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(str(IpAddress.objects.first().ip_address), '10.0.0.2')
+        self.assertEqual(str(self.ipaddress_model.objects.first().ip_address), '10.0.0.2')
 
     def test_read_ip_address_api(self):
         subnet = self._create_subnet(subnet="10.0.0.0/24")
@@ -126,14 +124,14 @@ class BaseTestApi(CreateModelsMixin):
                                      data=json.dumps({'description': 'Test Ip address'}),
                                      content_type='application/json')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(IpAddress.objects.get(pk=ip_address.id).description, 'Test Ip address')
+        self.assertEqual(self.ipaddress_model.objects.get(pk=ip_address.id).description, 'Test Ip address')
 
     def test_delete_ip_address_api(self):
         subnet = self._create_subnet(subnet="10.0.0.0/24")
         ip_address = self._create_ipaddress(ip_address="10.0.0.1", subnet=subnet)
         response = self.client.delete(reverse('ipam:ip_address', args=(ip_address.id,)))
         self.assertEqual(response.status_code, 204)
-        self.assertEqual(IpAddress.objects.count(), 0)
+        self.assertEqual(self.ipaddress_model.objects.count(), 0)
 
     def test_list_ipadress_subnet_api(self):
         subnet = self._create_subnet(subnet="10.0.0.0/24")

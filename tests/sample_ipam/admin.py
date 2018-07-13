@@ -4,17 +4,17 @@ from __future__ import unicode_literals
 import swapper
 from django.contrib import admin
 
-from django_ipam.admin import AbstractIPAddressAdmin, AbstractSubnetAdmin
+from django_ipam.admin import AbstractIpAddressAdmin, AbstractSubnetAdmin
 
-IPAddress = swapper.load_model("django_ipam", "IPAddress")
+IpAddress = swapper.load_model("django_ipam", "IpAddress")
 Subnet = swapper.load_model("django_ipam", "Subnet")
 
 
-@admin.register(IPAddress)
-class IPAddressAdmin(AbstractIPAddressAdmin):
+@admin.register(IpAddress)
+class IPAddressAdmin(AbstractIpAddressAdmin):
     pass
 
 
 @admin.register(Subnet)
 class SubnetAdmin(AbstractSubnetAdmin):
-    pass
+    app_name = "sample_ipam"

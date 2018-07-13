@@ -1,4 +1,7 @@
-from django_ipam.models import IpAddress, Subnet
+import swapper
+
+IpAddress = swapper.load_model("django_ipam", "IPAddress")
+Subnet = swapper.load_model("django_ipam", "Subnet")
 
 
 class CreateModelsMixin(object):

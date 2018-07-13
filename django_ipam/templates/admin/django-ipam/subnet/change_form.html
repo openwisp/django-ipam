@@ -17,7 +17,7 @@
           </li>
         {% else %}
           <li>
-            <a href="{% url 'admin:django_ipam_ipaddress_add' %}?_to_field=id&amp;_popup=1&amp;ip_address={{ ipaddr }}&amp;subnet={{ subnet.id }}"
+            <a href="{% url ipaddress_add_url %}?_to_field=id&amp;_popup=1&amp;ip_address={{ ipaddr }}&amp;subnet={{ subnet.id }}"
                onclick="return showAddAnotherPopup(this);">
               {{ ipaddr }}
             </a>
@@ -33,7 +33,7 @@
     <ul class="subnet-visual">
       {% for ipaddr in used_ip %}
       <li>
-        <a class="used" href="{% url 'admin:django_ipam_ipaddress_change' ipaddr.id %}"
+        <a class="used" href="{% url ipaddress_change_url ipaddr.id %}"
            onclick="return showAddAnotherPopup(this);">
            {{ ipaddr }}
         </a>
