@@ -1,17 +1,16 @@
 import os
 from unittest import skipIf
 
+import swapper
 from django.forms import ModelForm
 from django.test import TestCase
-
-from django_ipam.models import Subnet
 
 from .base.test_forms import BaseTestForms
 
 
 class NetworkAddressTestModelForm(ModelForm):
     class Meta:
-        model = Subnet
+        model = swapper.load_model("django_ipam", "Subnet")
         fields = ("subnet",)
 
 

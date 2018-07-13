@@ -71,8 +71,9 @@ class BaseTestAdmin(CreateModelsMixin):
     def test_subnet_popup_response(self):
         subnet = self._create_subnet(subnet="fdb6:21b:a477::9f7/64", description="Sample Subnet")
         self._create_ipaddress(ip_address="fdb6:21b:a477::9f7", subnet=subnet)
-
-        response = self.client.get('/admin/django_ipam/subnet/{0}/change/?_popup=1'.format(subnet.id),
+        print(reverse('admin:{0}_subnet_change'.format(self.app_name), args=[subnet.id])+"?_popup=1")
+        response = self.client.get(reverse('admin:{0}_subnet_change'.format(self.app_name),
+                                   args=[subnet.id])+"?_popup=1",
                                    follow=True)
         self.assertContains(response, 'ok')
 

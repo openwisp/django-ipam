@@ -14,9 +14,12 @@ IpAddress = swapper.load_model("django_ipam", "IpAddress")
 
 class AbstractSubnetAdmin(TimeReadonlyAdminMixin, ModelAdmin):
     change_form_template = "admin/django-ipam/subnet/change_form.html"
+    app_name = "django_ipam"
 
     def change_view(self, request, object_id, form_url="", extra_context=None):
         instance = Subnet.objects.get(pk=object_id)
+        ipaddress_add_url = "admin:{0}_ipaddress_add".format(self.app_name)
+        ipaddress_change_url = "admin:{0}_ipaddress_change".format(self.app_name)
         if request.GET.get('_popup'):
             return super(AbstractSubnetAdmin, self).change_view(request, object_id, form_url, extra_context)
         if type(instance.subnet) == IPv4Network:
@@ -32,7 +35,9 @@ class AbstractSubnetAdmin(TimeReadonlyAdminMixin, ModelAdmin):
                              'total': total,
                              'subnet': instance,
                              'used_ip': used_ip,
-                             'show_visual': show_visual}
+                             'show_visual': show_visual,
+                             'ipaddress_add_url': ipaddress_add_url,
+                             'ipaddress_change_url': ipaddress_change_url}
         elif type(instance.subnet) == IPv6Network:
             used_ip = [ip for ip in instance.ipaddress_set.all()]
             used = len(used_ip)
@@ -41,7 +46,9 @@ class AbstractSubnetAdmin(TimeReadonlyAdminMixin, ModelAdmin):
             values = [used, available]
             extra_context = {'labels': labels,
                              'values': values,
-                             'used_ip': used_ip}
+                             'used_ip': used_ip,
+                             'ipaddress_add_url': ipaddress_add_url,
+                             'ipaddress_change_url': ipaddress_change_url}
 
         return super(AbstractSubnetAdmin, self).change_view(request, object_id, form_url, extra_context)
 
