@@ -24,3 +24,7 @@ class SubnetSerializer(serializers.ModelSerializer):
         model = Subnet
         fields = '__all__'
         read_only_fields = ('created', 'modified')
+
+
+class ImportSubnetSerializer(serializers.Serializer):
+    csvfile = serializers.FileField()

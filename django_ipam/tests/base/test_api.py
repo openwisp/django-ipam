@@ -1,6 +1,7 @@
 import json
 
 from django.contrib.auth.models import User
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 
 from .base import CreateModelsMixin
@@ -141,6 +142,50 @@ class BaseTestApi(CreateModelsMixin):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]["ip_address"], '10.0.0.1')
         self.assertEqual(response.data[1]["ip_address"], '10.0.0.2')
+
+    def test_export_subnet_api(self):
+        subnet = self._create_subnet(subnet="10.0.0.0/24", name="Sample Subnet")
+        self._create_ipaddress(ip_address="10.0.0.1", subnet=subnet, description="Testing")
+        self._create_ipaddress(ip_address="10.0.0.2", subnet=subnet, description="Testing")
+        csv_data = """Sample Subnet\r
+        10.0.0.0/24\r
+        \r
+        ip_address,description\r
+        10.0.0.1,Testing\r
+        10.0.0.2,Testing\r
+        """
+        csv_data = bytes(csv_data.replace('        ', ''), 'utf-8')
+        response = self.client.post(reverse('ipam:export-subnet', args=(subnet.id,)))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, csv_data)
+
+    def test_import_subnet_api(self):
+        csv_data = """Monachers - Matera,
+        10.27.1.0/24,
+        ,
+        ip address,description
+        10.27.1.1,Monachers
+        10.27.1.254,Nano Beam 5 19AC"""
+        csvfile = SimpleUploadedFile("data.csv", bytes(csv_data, 'utf-8'))
+        response = self.client.post(reverse('ipam:import-subnet'), {'csvfile': csvfile})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(str(self.subnet_model.objects.first().subnet), '10.27.1.0/24')
+        self.assertEqual(str(self.ipaddress_model.objects.all()[0].ip_address), '10.27.1.1')
+        self.assertEqual(str(self.ipaddress_model.objects.all()[1].ip_address), '10.27.1.254')
+
+        csvfile = SimpleUploadedFile("data.txt", bytes(csv_data, 'utf-8'))
+        response = self.client.post(reverse('ipam:import-subnet'),
+                                    {'csvfile': csvfile}, follow=True)
+        self.assertEqual(response.status_code, 400)
+        csv_data = """Monachers - Matera,
+        ,
+        ,
+        ip address,description
+        10.27.1.1,Monachers
+        10.27.1.254,Nano Beam 5 19AC"""
+        invalid_file = SimpleUploadedFile("data.csv", bytes(csv_data, 'utf-8'))
+        response = self.client.post(reverse('ipam:import-subnet'), {'csvfile': invalid_file})
+        self.assertEqual(response.status_code, 400)
 
     def test_unauthorized_api_access(self):
         self.client.logout()

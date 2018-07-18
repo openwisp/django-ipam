@@ -1,6 +1,9 @@
+import csv
+from io import StringIO
 from ipaddress import ip_address, ip_network
 
 import swapper
+import xlrd
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -9,7 +12,12 @@ from openwisp_utils.base import TimeStampedEditableModel
 from .fields import NetworkField
 
 
+class CsvImportException(Exception):
+    pass
+
+
 class AbstractSubnet(TimeStampedEditableModel):
+    name = models.CharField(max_length=100, blank=True)
     subnet = NetworkField(db_index=True,
                           help_text=_('Subnet in CIDR notation, eg: "10.0.0.0/24" '
                                       'for IPv4 and "fdb6:21b:a477::9f7/64" for IPv6'))
@@ -54,6 +62,66 @@ class AbstractSubnet(TimeStampedEditableModel):
             ip_address.save()
             return ip_address
         return None
+
+    def import_csv(self, file):
+        ipaddress_model = swapper.load_model("django_ipam", "IpAddress")
+        subnet_model = swapper.load_model("django_ipam", "Subnet")
+        if file.name.endswith(('.xls', '.xlsx')):
+            book = xlrd.open_workbook(file_contents=file.read())
+            sheet = book.sheet_by_index(0)
+            row = []
+            for row_num in range(sheet.nrows):
+                row.append(sheet.row_values(row_num))
+            reader = iter(row)
+        else:
+            reader = csv.reader(StringIO(file.read().decode('utf-8')),
+                                delimiter=',')
+        subnet_name = next(reader)[0].strip()
+        subnet_value = next(reader)[0].strip()
+        try:
+            subnet = subnet_model.objects.get(name=subnet_name, subnet=subnet_value)
+        except ValidationError as e:
+            raise CsvImportException(str(e))
+        except subnet_model.DoesNotExist:
+            try:
+                subnet = subnet_model(name=subnet_name,
+                                      subnet=subnet_value)
+                subnet.full_clean()
+                subnet.save()
+            except ValidationError as e:
+                raise CsvImportException(str(e))
+        next(reader)
+        next(reader)
+        ipaddress_list = []
+        for row in reader:
+            if not ipaddress_model.objects.filter(subnet=subnet,
+                                                  ip_address=row[0].strip(),
+                                                  description=row[1].strip()).exists():
+                instance = ipaddress_model(subnet=subnet,
+                                           ip_address=row[0].strip(),
+                                           description=row[1].strip())
+                try:
+                    instance.full_clean()
+                except ValueError as e:
+                    raise CsvImportException(str(e))
+                ipaddress_list.append(instance)
+        for ip in ipaddress_list:
+            ip.save()
+
+    def export_csv(self, subnet_id, writer):
+        ipaddress_model = swapper.load_model("django_ipam", "IpAddress")
+        subnet = swapper.load_model("django_ipam", "Subnet").objects.get(pk=subnet_id)
+        writer.writerow([subnet.name, ])
+        writer.writerow([subnet.subnet, ])
+        writer.writerow('')
+        fields = [ipaddress_model._meta.get_field('ip_address'),
+                  ipaddress_model._meta.get_field('description')]
+        writer.writerow(field.name for field in fields)
+        for obj in subnet.ipaddress_set.all():
+            row = []
+            for field in fields:
+                row.append(str(getattr(obj, field.name)))
+            writer.writerow(row)
 
 
 class AbstractIpAddress(TimeStampedEditableModel):
