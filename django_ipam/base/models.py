@@ -17,7 +17,7 @@ class CsvImportException(Exception):
 
 
 class AbstractSubnet(TimeStampedEditableModel):
-    name = models.CharField(max_length=100, blank=True)
+    name = models.CharField(max_length=100, blank=True, db_index=True)
     subnet = NetworkField(db_index=True,
                           help_text=_('Subnet in CIDR notation, eg: "10.0.0.0/24" '
                                       'for IPv4 and "fdb6:21b:a477::9f7/64" for IPv6'))
