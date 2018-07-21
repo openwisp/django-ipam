@@ -28,15 +28,14 @@ install:
 
 before_script:
   - |
-  if [[ $TRAVIS_PYTHON_VERSION == 3.5 && $SAMPLE_APP != "1" ]]; then
-    OUTPUT=$(./tests/manage.py makemigrations --dry-run django_ipam)
-    echo $OUTPUT
-    echo $OUTPUT | grep "No changes detected"
-  fi
+    if [[ $TRAVIS_PYTHON_VERSION == 3.5 && $SAMPLE_APP != "1" ]]; then
+      OUTPUT=$(./tests/manage.py makemigrations --dry-run django_ipam)
+      echo $OUTPUT
+      echo $OUTPUT | grep "No changes detected"
+    fi
 
 # command to run tests, e.g. python setup.py test
 script:
-  - ./tests/manage.py makemigrations --dry-run django_ipam | grep "No changes detected"
   - coverage run --source=django_ipam runtests.py
 
 after_success:
