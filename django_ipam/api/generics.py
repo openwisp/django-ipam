@@ -1,11 +1,12 @@
 import csv
 
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 from rest_framework import pagination, serializers, status
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication
-from rest_framework.generics import CreateAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import (
+    CreateAPIView, ListCreateAPIView, RetrieveAPIView, RetrieveUpdateDestroyAPIView, get_object_or_404,
+)
 from rest_framework.permissions import DjangoModelPermissions
 from rest_framework.response import Response
 
@@ -17,6 +18,15 @@ class ListViewPagination(pagination.PageNumberPagination):
     page_size = 10
     page_size_query_param = 'page_size'
     max_page_size = 100
+
+
+class BaseAvailableIpView(RetrieveAPIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (DjangoModelPermissions,)
+
+    def get(self, request, *args, **kwargs):
+        subnet = get_object_or_404(self.subnet_model, pk=self.kwargs["subnet_id"])
+        return Response(subnet.get_first_available_ip())
 
 
 class BaseIpAddressListCreateView(ListCreateAPIView):
