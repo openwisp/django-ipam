@@ -3,7 +3,7 @@ import csv
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
-from rest_framework import serializers, status
+from rest_framework import pagination, serializers, status
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication
 from rest_framework.generics import CreateAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import DjangoModelPermissions
@@ -13,20 +13,28 @@ from ..base.models import CsvImportException
 from .serializers import ImportSubnetSerializer, IpAddressSerializer, IpRequestSerializer, SubnetSerializer
 
 
+class ListViewPagination(pagination.PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+
 class BaseIpAddressListCreateView(ListCreateAPIView):
     serializer_class = IpAddressSerializer
     authentication_classes = (SessionAuthentication, BasicAuthentication)
     permission_classes = (DjangoModelPermissions,)
+    pagination_class = ListViewPagination
 
     def get_queryset(self):
         subnet = get_object_or_404(self.subnet_model, pk=self.kwargs["subnet_id"])
-        return subnet.ipaddress_set.all()
+        return subnet.ipaddress_set.all().order_by('ip_address')
 
 
 class BaseSubnetListCreateView(ListCreateAPIView):
     serializer_class = SubnetSerializer
     authentication_classes = (SessionAuthentication, BasicAuthentication)
     permission_classes = (DjangoModelPermissions,)
+    pagination_class = ListViewPagination
 
 
 class BaseSubnetView(RetrieveUpdateDestroyAPIView):

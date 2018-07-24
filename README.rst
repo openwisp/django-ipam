@@ -132,6 +132,17 @@ This authentication scheme uses Django's default session backend for authenticat
 
     http -a username:password <HTTP verb> <api url>
 
+Pagination
+##########
+
+API pagination is provided with the help `page` parameter.
+The default page size is 10 which can be overridden using the `page_size` parameter.
+
+.. code-block:: text
+
+    /api/v1/<api endpoint url>/?page=1&page_size=10
+
+
 Get First Available IP
 ######################
 
