@@ -138,10 +138,10 @@ class BaseTestApi(CreateModelsMixin):
         subnet = self._create_subnet(subnet="10.0.0.0/24")
         self._create_ipaddress(ip_address="10.0.0.1", subnet=subnet)
         self._create_ipaddress(ip_address="10.0.0.2", subnet=subnet)
-        response = self.client.get(reverse('ipam:list_create_ip_address', args=(subnet.id,)))
+        response = self.client.get(reverse('ipam:list_create_ip_address', args=(subnet.id,))+"?page=1")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data[0]["ip_address"], '10.0.0.1')
-        self.assertEqual(response.data[1]["ip_address"], '10.0.0.2')
+        self.assertEqual(response.data["results"][0]["ip_address"], '10.0.0.1')
+        self.assertEqual(response.data["results"][1]["ip_address"], '10.0.0.2')
 
     def test_export_subnet_api(self):
         subnet = self._create_subnet(subnet="10.0.0.0/24", name="Sample Subnet")
