@@ -435,10 +435,16 @@ The base API view classes can be extended into other django applications.
     # your app.api.views
     from ..models import Subnet, IpAddress
 
-    from django_ipam.api.generics import (
-        BaseIpAddressListCreateView, BaseIpAddressView, BaseRequestIPView, BaseSubnetListCreateView,
-        BaseSubnetView,
+    from .generics import (
+        BaseAvailableIpView, BaseExportSubnetView, BaseImportSubnetView, BaseIpAddressListCreateView,
+        BaseIpAddressView, BaseRequestIPView, BaseSubnetListCreateView, BaseSubnetView,
     )
+
+
+    class AvailableIpView(BaseAvailableIpView):
+        subnet_model = Subnet
+        queryset = IpAddress.objects.none()
+
 
     class RequestIPView(BaseRequestIPView):
         subnet_model = Subnet

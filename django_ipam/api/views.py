@@ -1,24 +1,20 @@
 import swapper
-from django.shortcuts import get_object_or_404
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
 
 from .generics import (
-    BaseExportSubnetView, BaseImportSubnetView, BaseIpAddressListCreateView, BaseIpAddressView,
-    BaseRequestIPView, BaseSubnetListCreateView, BaseSubnetView,
+    BaseAvailableIpView, BaseExportSubnetView, BaseImportSubnetView, BaseIpAddressListCreateView,
+    BaseIpAddressView, BaseRequestIPView, BaseSubnetListCreateView, BaseSubnetView,
 )
 
 IpAddress = swapper.load_model('django_ipam', 'IpAddress')
 Subnet = swapper.load_model('django_ipam', 'Subnet')
 
 
-@api_view(['GET'])
-def get_first_available_ip(request, subnet_id):
+class AvailableIpView(BaseAvailableIpView):
     """
     Get the next available IP address under a subnet
     """
-    subnet = get_object_or_404(Subnet, pk=subnet_id)
-    return Response(subnet.get_first_available_ip())
+    subnet_model = Subnet
+    queryset = IpAddress.objects.none()
 
 
 class RequestIPView(BaseRequestIPView):
@@ -80,3 +76,4 @@ subnet_list_create = SubnetListCreateView.as_view()
 subnet = SubnetView.as_view()
 ip_address = IpAddressView.as_view()
 subnet_list_ipaddress = SubnetIpAddressListCreateView.as_view()
+get_first_available_ip = AvailableIpView.as_view()
