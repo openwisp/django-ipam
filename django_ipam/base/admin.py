@@ -82,21 +82,22 @@ class AbstractSubnetAdmin(TimeReadonlyAdminMixin, ModelAdmin):
     def import_ipaddress(self, request):
         form = IpAddressImportForm()
         form_template = 'admin/django-ipam/subnet/import.html'
+        subnet_list_url = "admin:{0}_subnet_changelist".format(self.app_name)
         if request.method == 'POST':
             form = IpAddressImportForm(request.POST, request.FILES)
             if form.is_valid():
                 file = request.FILES['csvfile']
                 if not file.name.endswith(('.csv', '.xls', '.xlsx')):
                     messages.error(request, _('File type not supported.'))
-                    return render(request, form_template, {'form': form})
+                    return render(request, form_template, {'form': form, 'subnet_list_url': subnet_list_url})
                 try:
                     Subnet.import_csv(self, file)
                 except CsvImportException as e:
                     messages.error(request, str(e))
-                    return render(request, form_template, {'form': form})
+                    return render(request, form_template, {'form': form, 'subnet_list_url': subnet_list_url})
                 messages.success(request, _('Successfully imported data.'))
                 return redirect("/admin/{0}/subnet".format(self.app_name))
-        return render(request, form_template, {'form': form})
+        return render(request, form_template, {'form': form, 'subnet_list_url': subnet_list_url})
 
     class Media:
         js = ('django-ipam/js/custom.js',)
