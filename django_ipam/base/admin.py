@@ -97,7 +97,11 @@ class AbstractSubnetAdmin(TimeReadonlyAdminMixin, ModelAdmin):
                     return render(request, form_template, {'form': form, 'subnet_list_url': subnet_list_url})
                 messages.success(request, _('Successfully imported data.'))
                 return redirect("/admin/{0}/subnet".format(self.app_name))
-        return render(request, form_template, {'form': form, 'subnet_list_url': subnet_list_url})
+        return render(request, form_template, {
+            'form': form,
+            'subnet_list_url': subnet_list_url,
+            'has_permission': True
+        })
 
     class Media:
         js = ('django-ipam/js/custom.js',)

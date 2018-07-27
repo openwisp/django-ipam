@@ -5,30 +5,6 @@
   {% trans "Import Subnet" %}
 {% endblock %}
 
-{% block usertools %}
-<div id="user-tools">
-    {% block welcome-msg %}
-        {% trans 'Welcome,' %}
-        <strong>{% firstof user.get_short_name user.get_username %}</strong>.
-    {% endblock %}
-    {% block userlinks %}
-        {% if site_url %}
-            <a href="{{ site_url }}">{% trans 'View site' %}</a> /
-        {% endif %}
-        {% if user.is_active and user.is_staff %}
-            {% url 'django-admindocs-docroot' as docsroot %}
-            {% if docsroot %}
-                <a href="{{ docsroot }}">{% trans 'Documentation' %}</a> /
-            {% endif %}
-        {% endif %}
-        {% if user.has_usable_password %}
-        <a href="{% url 'admin:password_change' %}">{% trans 'Change password' %}</a> /
-        {% endif %}
-        <a href="{% url 'admin:logout' %}">{% trans 'Log out' %}</a>
-    {% endblock %}
-</div>
-{% endblock %}
-
 {% block breadcrumbs %}
 <div class="breadcrumbs">
 <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
