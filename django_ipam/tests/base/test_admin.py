@@ -13,9 +13,9 @@ class BaseTestAdmin(CreateModelsMixin):
         self.client.login(username='admin', password='tester')
 
     def test_ipaddress_invalid_entry(self):
-        subnet = self._create_subnet(subnet="10.0.0.0/24", description="Sample Subnet")
+        subnet = self._create_subnet(subnet='10.0.0.0/24', description='Sample Subnet')
         post_data = {
-            'ip_address': "12344",
+            'ip_address': '12344',
             'subnet': subnet.id,
             'created_0': '2017-08-08',
             'created_1': '15:16:10',
@@ -28,8 +28,8 @@ class BaseTestAdmin(CreateModelsMixin):
         self.assertContains(response, 'Enter a valid IPv4 or IPv6 address.')
 
     def test_ipaddress_change(self):
-        subnet = self._create_subnet(subnet="10.0.0.0/24", description="Sample Subnet")
-        obj = self._create_ipaddress(ip_address="10.0.0.1", subnet=subnet)
+        subnet = self._create_subnet(subnet='10.0.0.0/24', description='Sample Subnet')
+        obj = self._create_ipaddress(ip_address='10.0.0.1', subnet=subnet)
 
         response = self.client.get(reverse('admin:{0}_ipaddress_change'.format(self.app_name), args=[obj.pk]),
                                    follow=True)
@@ -37,17 +37,16 @@ class BaseTestAdmin(CreateModelsMixin):
         self.assertEqual(self.ipaddress_model.objects.get(pk=obj.pk).ip_address, '10.0.0.1')
 
     def test_ipv4_subnet_change(self):
-        subnet = self._create_subnet(subnet="10.0.0.0/24", description="Sample Subnet")
-        self._create_ipaddress(ip_address="10.0.0.1", subnet=subnet)
-
-        response = self.client.get(reverse('admin:{0}_subnet_change'.format(self.app_name), args=[subnet.pk]),
-                                   follow=True)
+        subnet = self._create_subnet(subnet='10.0.0.0/24', description='Sample Subnet')
+        self._create_ipaddress(ip_address='10.0.0.1', subnet=subnet)
+        url = reverse('admin:{0}_subnet_change'.format(self.app_name), args=[subnet.pk])
+        response = self.client.get(url)
         self.assertContains(response, 'ok')
         self.assertContains(response, '<h3>Subnet Visual Display</h3>')
 
     def test_ipv6_subnet_change(self):
-        subnet = self._create_subnet(subnet="fdb6:21b:a477::9f7/64", description="Sample Subnet")
-        self._create_ipaddress(ip_address="fdb6:21b:a477::9f7", subnet=subnet)
+        subnet = self._create_subnet(subnet='fdb6:21b:a477::9f7/64', description='Sample Subnet')
+        self._create_ipaddress(ip_address='fdb6:21b:a477::9f7', subnet=subnet)
 
         response = self.client.get(reverse('admin:{0}_subnet_change'.format(self.app_name), args=[subnet.pk]),
                                    follow=True)
@@ -56,7 +55,7 @@ class BaseTestAdmin(CreateModelsMixin):
 
     def test_subnet_invalid_entry(self):
         post_data = {
-            'subnet': "12344",
+            'subnet': '12344',
             'created_0': '2017-08-08',
             'created_1': '15:16:10',
             'modified_0': '2017-08-08',
@@ -69,17 +68,17 @@ class BaseTestAdmin(CreateModelsMixin):
         self.assertContains(response, 'Enter a valid CIDR address.')
 
     def test_subnet_popup_response(self):
-        subnet = self._create_subnet(subnet="fdb6:21b:a477::9f7/64", description="Sample Subnet")
-        self._create_ipaddress(ip_address="fdb6:21b:a477::9f7", subnet=subnet)
+        subnet = self._create_subnet(subnet='fdb6:21b:a477::9f7/64', description='Sample Subnet')
+        self._create_ipaddress(ip_address='fdb6:21b:a477::9f7', subnet=subnet)
         response = self.client.get(reverse('admin:{0}_subnet_change'.format(self.app_name),
-                                   args=[subnet.id])+"?_popup=1",
+                                   args=[subnet.id])+'?_popup=1',
                                    follow=True)
         self.assertContains(response, 'ok')
 
     def test_ipaddress_response(self):
-        subnet = self._create_subnet(subnet="10.0.0.0/24", description="Sample Subnet")
+        subnet = self._create_subnet(subnet='10.0.0.0/24', description='Sample Subnet')
         post_data = {
-            'ip_address': "10.0.0.1",
+            'ip_address': '10.0.0.1',
             'subnet': subnet.id,
             'created_0': '2017-08-08',
             'created_1': '15:16:10',
@@ -91,9 +90,9 @@ class BaseTestAdmin(CreateModelsMixin):
         self.assertContains(response, 'ok')
 
     def test_ipaddress_popup_response(self):
-        subnet = self._create_subnet(subnet="10.0.0.0/24", description="Sample Subnet")
+        subnet = self._create_subnet(subnet='10.0.0.0/24', description='Sample Subnet')
         post_data = {
-            'ip_address': "10.0.0.1",
+            'ip_address': '10.0.0.1',
             'subnet': subnet.id,
             'created_0': '2017-08-08',
             'created_1': '15:16:10',
@@ -114,8 +113,8 @@ class BaseTestAdmin(CreateModelsMixin):
         10.27.1.252,NanoStation M5
         10.27.1.253,NanoStation M5
         10.27.1.254,Nano Beam 5 19AC"""
-        csvfile = SimpleUploadedFile("data.csv", bytes(csv_data, 'utf-8'))
-        response = self.client.post(reverse('admin:import_ipaddress'.format(self.app_name)),
+        csvfile = SimpleUploadedFile('data.csv', bytes(csv_data, 'utf-8'))
+        response = self.client.post(reverse('admin:ipam_import_subnet'.format(self.app_name)),
                                     {'csvfile': csvfile}, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(str(self.subnet_model.objects.first().subnet), '10.27.1.0/24')
@@ -125,8 +124,8 @@ class BaseTestAdmin(CreateModelsMixin):
         self.assertEqual(str(self.ipaddress_model.objects.all()[3].ip_address), '10.27.1.254')
 
     def test_existing_csv_data(self):
-        subnet = self._create_subnet(name="Monachers - Matera", subnet="10.27.1.0/24")
-        self._create_ipaddress(ip_address="10.27.1.1", subnet=subnet, description="Monachers")
+        subnet = self._create_subnet(name='Monachers - Matera', subnet='10.27.1.0/24')
+        self._create_ipaddress(ip_address='10.27.1.1', subnet=subnet, description='Monachers')
         csv_data = """Monachers - Matera,
         10.27.1.0/24,
         ,
@@ -135,8 +134,8 @@ class BaseTestAdmin(CreateModelsMixin):
         10.27.1.252,NanoStation M5
         10.27.1.253,NanoStation M5
         10.27.1.254,Nano Beam 5 19AC"""
-        csvfile = SimpleUploadedFile("data.csv", bytes(csv_data, 'utf-8'))
-        response = self.client.post(reverse('admin:import_ipaddress'.format(self.app_name)),
+        csvfile = SimpleUploadedFile('data.csv', bytes(csv_data, 'utf-8'))
+        response = self.client.post(reverse('admin:ipam_import_subnet'.format(self.app_name)),
                                     {'csvfile': csvfile}, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(str(self.ipaddress_model.objects.all()[1].ip_address), '10.27.1.252')
@@ -152,8 +151,8 @@ class BaseTestAdmin(CreateModelsMixin):
         10.27.1.252,NanoStation M5
         10.27.1.253,NanoStation M5
         10.27.1.254,Nano Beam 5 19AC"""
-        csvfile = SimpleUploadedFile("data.txt", bytes(csv_data, 'utf-8'))
-        response = self.client.post(reverse('admin:import_ipaddress'.format(self.app_name)),
+        csvfile = SimpleUploadedFile('data.txt', bytes(csv_data, 'utf-8'))
+        response = self.client.post(reverse('admin:ipam_import_subnet'.format(self.app_name)),
                                     {'csvfile': csvfile}, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'File type not supported.')
@@ -167,8 +166,8 @@ class BaseTestAdmin(CreateModelsMixin):
         NanoStation M5
         10.27.1.253,NanoStation M5
         10.27.1.254,Nano Beam 5 19AC"""
-        csvfile = SimpleUploadedFile("data.csv", bytes(csv_data, 'utf-8'))
-        response = self.client.post(reverse('admin:import_ipaddress'.format(self.app_name)),
+        csvfile = SimpleUploadedFile('data.csv', bytes(csv_data, 'utf-8'))
+        response = self.client.post(reverse('admin:ipam_import_subnet'.format(self.app_name)),
                                     {'csvfile': csvfile}, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'does not appear to be an IPv4 or IPv6 network')
@@ -182,18 +181,18 @@ class BaseTestAdmin(CreateModelsMixin):
         10.27.1.252,NanoStation M5
         10.27.1.253,NanoStation M5
         10.27.1.254,Nano Beam 5 19AC"""
-        csvfile = SimpleUploadedFile("data.csv", bytes(csv_data, 'utf-8'))
-        response = self.client.post(reverse('admin:import_ipaddress'.format(self.app_name)),
+        csvfile = SimpleUploadedFile('data.csv', bytes(csv_data, 'utf-8'))
+        response = self.client.post(reverse('admin:ipam_import_subnet'.format(self.app_name)),
                                     {'csvfile': csvfile}, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'does not appear to be an IPv4 or IPv6 address')
 
     def test_subnet_csv_export(self):
-        subnet = self._create_subnet(subnet="10.0.0.0/24", name="Sample Subnet")
-        self._create_ipaddress(ip_address="10.0.0.1", subnet=subnet, description="Testing")
-        self._create_ipaddress(ip_address="10.0.0.2", subnet=subnet, description="Testing")
-        self._create_ipaddress(ip_address="10.0.0.3", subnet=subnet)
-        self._create_ipaddress(ip_address="10.0.0.4", subnet=subnet)
+        subnet = self._create_subnet(subnet='10.0.0.0/24', name='Sample Subnet')
+        self._create_ipaddress(ip_address='10.0.0.1', subnet=subnet, description='Testing')
+        self._create_ipaddress(ip_address='10.0.0.2', subnet=subnet, description='Testing')
+        self._create_ipaddress(ip_address='10.0.0.3', subnet=subnet)
+        self._create_ipaddress(ip_address='10.0.0.4', subnet=subnet)
 
         csv_data = """Sample Subnet\r
         10.0.0.0/24\r
@@ -205,10 +204,11 @@ class BaseTestAdmin(CreateModelsMixin):
         10.0.0.4,\r
         """
         csv_data = bytes(csv_data.replace('        ', ''), 'utf-8')
-        response = self.client.get(reverse('admin:export_ipaddress', args=[subnet.id]), follow=True)
+        url = reverse('admin:ipam_export_subnet', args=[subnet.id])
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, csv_data)
 
     def test_importcsv_form(self):
-        response = self.client.get(reverse('admin:import_ipaddress'), follow=True)
+        response = self.client.get(reverse('admin:ipam_import_subnet'))
         self.assertEqual(response.status_code, 200)

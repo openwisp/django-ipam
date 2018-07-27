@@ -9,5 +9,5 @@ from .base.test_models import BaseTestModel
 
 @skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
 class TestModel(BaseTestModel, TestCase):
-    ipaddress_model = swapper.load_model("django_ipam", "IPAddress")
-    subnet_model = swapper.load_model("django_ipam", "Subnet")
+    ipaddress_model = swapper.load_model('django_ipam', 'IPAddress')
+    subnet_model = swapper.load_model('django_ipam', 'Subnet')

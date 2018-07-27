@@ -42,7 +42,7 @@ class BaseTestModel(CreateModelsMixin):
             self._create_ipaddress(ip_address='10.0.0.1',
                                    subnet=self.subnet_model.objects.first())
         except ValidationError as e:
-            self.assertTrue(e.message_dict['ip_address'] == ["IP address already used."])
+            self.assertTrue(e.message_dict['ip_address'] == ['IP address already used.'])
             failed = False
         if failed:
             self.fail('ValidationError not raised')
@@ -145,7 +145,7 @@ class BaseTestModel(CreateModelsMixin):
     def test_save_blank_subnet_fails(self):
         failed = True
         try:
-            self._create_subnet(subnet="")
+            self._create_subnet(subnet='')
         except ValidationError:
             failed = False
         if failed:

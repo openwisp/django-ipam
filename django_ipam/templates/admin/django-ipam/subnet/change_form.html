@@ -3,16 +3,20 @@
 {% load static %}
 
 {% block object-tools-items %}
+{% if has_change_permission %}
 <li>
-  <a href="{% url 'admin:export_ipaddress' subnet.id %}">
-    {% trans "Export" %}
+  <a href="{% url 'admin:ipam_export_subnet' subnet.id %}">
+    {% trans 'Export Subnet Data' %}
   </a>
 </li>
+{% endif %}
+{% if has_add_permission %}
 <li>
-  <a href="{% url 'admin:import_ipaddress' %}">
-    {% trans "Import" %}
+  <a href="{% url 'admin:ipam_import_subnet' %}">
+    {% trans 'Import Addresses into Subnet' %}
   </a>
 </li>
+{% endif %}
 {{ block.super }}
 {% endblock %}
 
@@ -20,7 +24,7 @@
   <div id="graph"></div>
   {% if show_visual %}
   <div>
-    <h3>Subnet Visual Display</h3>
+    <h3>{% trans 'Subnet Visual Display' %}</h3>
     <ul class="subnet-visual">
       {% for ipaddr in total %}
         {% if ipaddr in used_ip %}
@@ -43,7 +47,7 @@
   {% else %}
   <div class="list-ip">
     {% if used_ip|length != 0 %}
-    <h3>Used IP address</h3>
+    <h3>{% trans 'Used IP address' %}</h3>
     <ul class="subnet-visual">
       {% for ipaddr in used_ip %}
       <li>
@@ -88,7 +92,7 @@
       }
     ];
     layout = {
-      title: "Subnet Freespace Display"
+      title: '{% trans "Subnet Freespace Display" %}'
     };
     Plotly.newPlot('graph', data, layout);
   </script>
