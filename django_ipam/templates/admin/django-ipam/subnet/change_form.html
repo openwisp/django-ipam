@@ -24,7 +24,7 @@
   <div id="graph"></div>
   {% if show_visual %}
   <div>
-    <h3>Subnet Visual Display</h3>
+    <h3>{% trans 'Subnet Visual Display' %}</h3>
     <ul class="subnet-visual">
       {% for ipaddr in total %}
         {% if ipaddr in used_ip %}
@@ -47,7 +47,7 @@
   {% else %}
   <div class="list-ip">
     {% if used_ip|length != 0 %}
-    <h3>Used IP address</h3>
+    <h3>{% trans 'Used IP address' %}</h3>
     <ul class="subnet-visual">
       {% for ipaddr in used_ip %}
       <li>
@@ -92,7 +92,7 @@
       }
     ];
     layout = {
-      title: "Subnet Freespace Display"
+      title: '{% trans "Subnet Freespace Display" %}'
     };
     Plotly.newPlot('graph', data, layout);
   </script>

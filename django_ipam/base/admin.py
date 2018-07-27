@@ -14,21 +14,21 @@ from openwisp_utils.admin import TimeReadonlyAdminMixin
 from .forms import IpAddressImportForm
 from .models import CsvImportException
 
-Subnet = swapper.load_model("django_ipam", "Subnet")
-IpAddress = swapper.load_model("django_ipam", "IpAddress")
+Subnet = swapper.load_model('django_ipam', 'Subnet')
+IpAddress = swapper.load_model('django_ipam', 'IpAddress')
 
 
 class AbstractSubnetAdmin(TimeReadonlyAdminMixin, ModelAdmin):
-    change_form_template = "admin/django-ipam/subnet/change_form.html"
-    change_list_template = "admin/django-ipam/subnet/change_list.html"
-    app_name = "django_ipam"
+    change_form_template = 'admin/django-ipam/subnet/change_form.html'
+    change_list_template = 'admin/django-ipam/subnet/change_list.html'
+    app_name = 'django_ipam'
     list_display = ('name', 'subnet', 'master_subnet', 'description')
     search_fields = ['subnet', 'name']
 
-    def change_view(self, request, object_id, form_url="", extra_context=None):
+    def change_view(self, request, object_id, form_url='', extra_context=None):
         instance = Subnet.objects.get(pk=object_id)
-        ipaddress_add_url = "admin:{0}_ipaddress_add".format(self.app_name)
-        ipaddress_change_url = "admin:{0}_ipaddress_change".format(self.app_name)
+        ipaddress_add_url = 'admin:{0}_ipaddress_add'.format(self.app_name)
+        ipaddress_change_url = 'admin:{0}_ipaddress_change'.format(self.app_name)
         if request.GET.get('_popup'):
             return super(AbstractSubnetAdmin, self).change_view(request, object_id, form_url, extra_context)
         if type(instance.subnet) == IPv4Network:
@@ -67,8 +67,8 @@ class AbstractSubnetAdmin(TimeReadonlyAdminMixin, ModelAdmin):
         custom_urls = [
             re_path(r'^(?P<subnet_id>[^/]+)/export-ipaddress/',
                     self.export_ipaddress,
-                    name="export_ipaddress"),
-            path('import/', self.import_ipaddress, name="import_ipaddress"),
+                    name='export_ipaddress'),
+            path('import/', self.import_ipaddress, name='import_ipaddress'),
         ]
         return custom_urls + urls
 
@@ -82,26 +82,28 @@ class AbstractSubnetAdmin(TimeReadonlyAdminMixin, ModelAdmin):
     def import_ipaddress(self, request):
         form = IpAddressImportForm()
         form_template = 'admin/django-ipam/subnet/import.html'
-        subnet_list_url = "admin:{0}_subnet_changelist".format(self.app_name)
+        subnet_list_url = 'admin:{0}_subnet_changelist'.format(self.app_name)
+        context = {
+            'form': form,
+            'subnet_list_url': subnet_list_url,
+            'has_permission': True
+        }
         if request.method == 'POST':
             form = IpAddressImportForm(request.POST, request.FILES)
+            context['form'] = form
             if form.is_valid():
                 file = request.FILES['csvfile']
                 if not file.name.endswith(('.csv', '.xls', '.xlsx')):
                     messages.error(request, _('File type not supported.'))
-                    return render(request, form_template, {'form': form, 'subnet_list_url': subnet_list_url})
+                    return render(request, form_template, context)
                 try:
                     Subnet.import_csv(self, file)
                 except CsvImportException as e:
                     messages.error(request, str(e))
-                    return render(request, form_template, {'form': form, 'subnet_list_url': subnet_list_url})
+                    return render(request, form_template, context)
                 messages.success(request, _('Successfully imported data.'))
-                return redirect("/admin/{0}/subnet".format(self.app_name))
-        return render(request, form_template, {
-            'form': form,
-            'subnet_list_url': subnet_list_url,
-            'has_permission': True
-        })
+                return redirect('/admin/{0}/subnet'.format(self.app_name))
+        return render(request, form_template, context)
 
     class Media:
         js = ('django-ipam/js/custom.js',)
@@ -111,13 +113,13 @@ class AbstractSubnetAdmin(TimeReadonlyAdminMixin, ModelAdmin):
 class IpAddressAdminForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(IpAddressAdminForm, self).__init__(*args, **kwargs)
-        self.fields["subnet"].help_text = _('Select a subnet and the first available IP address '
+        self.fields['subnet'].help_text = _('Select a subnet and the first available IP address '
                                             'will be automatically suggested in the ip address field')
 
 
 class AbstractIpAddressAdmin(TimeReadonlyAdminMixin, ModelAdmin):
     form = IpAddressAdminForm
-    change_form_template = "admin/django-ipam/ip_address/change_form.html"
+    change_form_template = 'admin/django-ipam/ip_address/change_form.html'
     list_display = ('ip_address', 'subnet', 'description')
     list_filter = ('subnet',)
     search_fields = ['ip_address']
@@ -126,25 +128,27 @@ class AbstractIpAddressAdmin(TimeReadonlyAdminMixin, ModelAdmin):
         js = ('django-ipam/js/ip-request.js',)
 
     def get_extra_context(self):
-        return {'get_first_available_ip_url': reverse('ipam:get_first_available_ip', args=('0000',))}
+        url = reverse('ipam:get_first_available_ip', args=['0000'])
+        return {'get_first_available_ip_url': url}
 
     def add_view(self, request, form_url='', extra_context=None):
         return super(AbstractIpAddressAdmin, self).add_view(request, form_url, self.get_extra_context())
 
-    def change_view(self, request, object_id, form_url="", extra_context=None):
+    def change_view(self, request, object_id, form_url='', extra_context=None):
         return super(AbstractIpAddressAdmin, self).change_view(request,
                                                                object_id,
                                                                form_url,
                                                                self.get_extra_context())
 
-    def response_add(self, request, obj, post_url_continue='../%s/'):
+    def response_add(self, request, *args, **kwargs):
         """
         Custom reponse to dismiss an add form popup for IP address.
         """
-        resp = super(AbstractIpAddressAdmin, self).response_add(request, obj, post_url_continue)
-        if request.POST.get("_popup"):
-            return HttpResponse('''
-               <script type="text/javascript">
+        response = super(AbstractIpAddressAdmin, self).response_add(request, *args, **kwargs)
+        if request.POST.get('_popup'):
+            return HttpResponse("""
+               <script type='text/javascript'>
                   opener.dismissAddAnotherPopup(window);
-               </script>''')
-        return resp
+               </script>
+             """)
+        return response

@@ -2,12 +2,12 @@ import csv
 from io import StringIO
 from ipaddress import ip_address, ip_network
 
-import swapper
 import xlrd
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from openwisp_utils.base import TimeStampedEditableModel
+from swapper import get_model_name, load_model
 
 from .fields import NetworkField
 
@@ -38,9 +38,13 @@ class AbstractSubnet(TimeStampedEditableModel):
     def clean(self):
         if not self.subnet:
             return
-        for subnet in swapper.load_model("django_ipam", "Subnet").objects.filter().values():
-            if self.id != subnet["id"] and ip_network(self.subnet).overlaps(subnet["subnet"]):
-                raise ValidationError({'subnet': _('Subnet overlaps with %s') % (subnet["subnet"])})
+        for subnet in load_model('django_ipam', 'Subnet').objects.filter().values():
+            if self.id == subnet['id']:
+                continue
+            if ip_network(self.subnet).overlaps(subnet['subnet']):
+                raise ValidationError({
+                    'subnet': _('Subnet overlaps with %s') % subnet['subnet']
+                })
 
     def get_first_available_ip(self):
         ipaddress_set = [ip.ip_address for ip in self.ipaddress_set.all()]
@@ -53,19 +57,19 @@ class AbstractSubnet(TimeStampedEditableModel):
         if options is None:
             options = {}
         ip = self.get_first_available_ip()
-        if ip:
-            ip_address = swapper.load_model("django_ipam", "IpAddress")(
-                                            ip_address=ip,
-                                            subnet=self,
-                                            **options)
-            ip_address.full_clean()
-            ip_address.save()
-            return ip_address
-        return None
+        if not ip:
+            return None
+        ip_address = load_model('django_ipam', 'IpAddress')(
+                                ip_address=ip,
+                                subnet=self,
+                                **options)
+        ip_address.full_clean()
+        ip_address.save()
+        return ip_address
 
     def import_csv(self, file):
-        ipaddress_model = swapper.load_model("django_ipam", "IpAddress")
-        subnet_model = swapper.load_model("django_ipam", "Subnet")
+        ipaddress_model = load_model('django_ipam', 'IpAddress')
+        subnet_model = load_model('django_ipam', 'Subnet')
         if file.name.endswith(('.xls', '.xlsx')):
             book = xlrd.open_workbook(file_contents=file.read())
             sheet = book.sheet_by_index(0)
@@ -79,7 +83,8 @@ class AbstractSubnet(TimeStampedEditableModel):
         subnet_name = next(reader)[0].strip()
         subnet_value = next(reader)[0].strip()
         try:
-            subnet = subnet_model.objects.get(name=subnet_name, subnet=subnet_value)
+            subnet = subnet_model.objects.get(name=subnet_name,
+                                              subnet=subnet_value)
         except ValidationError as e:
             raise CsvImportException(str(e))
         except subnet_model.DoesNotExist:
@@ -109,8 +114,8 @@ class AbstractSubnet(TimeStampedEditableModel):
             ip.save()
 
     def export_csv(self, subnet_id, writer):
-        ipaddress_model = swapper.load_model("django_ipam", "IpAddress")
-        subnet = swapper.load_model("django_ipam", "Subnet").objects.get(pk=subnet_id)
+        ipaddress_model = load_model('django_ipam', 'IpAddress')
+        subnet = load_model('django_ipam', 'Subnet').objects.get(pk=subnet_id)
         writer.writerow([subnet.name, ])
         writer.writerow([subnet.subnet, ])
         writer.writerow('')
@@ -125,7 +130,7 @@ class AbstractSubnet(TimeStampedEditableModel):
 
 
 class AbstractIpAddress(TimeStampedEditableModel):
-    subnet = models.ForeignKey(swapper.get_model_name("django_ipam", "Subnet"),
+    subnet = models.ForeignKey(get_model_name('django_ipam', 'Subnet'),
                                on_delete=models.CASCADE)
     ip_address = models.GenericIPAddressField()
     description = models.CharField(max_length=100, blank=True)
@@ -137,10 +142,17 @@ class AbstractIpAddress(TimeStampedEditableModel):
         return self.ip_address
 
     def clean(self):
-        if not self.ip_address:
+        if not self.ip_address or not self.subnet_id:
             return
-        if self.subnet_id and ip_address(self.ip_address) not in self.subnet.subnet:
-            raise ValidationError({'ip_address': _('IP address does not belong to the subnet')})
-        for ip in swapper.load_model("django_ipam", "IpAddress").objects.filter().values():
-            if self.id != ip["id"] and ip_address(self.ip_address) == ip_address(ip["ip_address"]):
-                raise ValidationError({'ip_address': _('IP address already used.')})
+        if ip_address(self.ip_address) not in self.subnet.subnet:
+            raise ValidationError({
+                'ip_address': _('IP address does not belong to the subnet')
+            })
+        addresses = load_model('django_ipam', 'IpAddress').objects.all().values()
+        for ip in addresses:
+            if self.id == ip['id']:
+                continue
+            if ip_address(self.ip_address) == ip_address(ip['ip_address']):
+                raise ValidationError({
+                    'ip_address': _('IP address already used.')
+                })

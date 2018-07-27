@@ -7,11 +7,11 @@ from .base import CreateModelsMixin
 
 class BaseTestCommands(CreateModelsMixin):
     def test_export_subnet_command(self):
-        subnet = self._create_subnet(subnet="10.0.0.0/24", name="Sample Subnet")
-        self._create_ipaddress(ip_address="10.0.0.1", subnet=subnet, description="Testing")
-        self._create_ipaddress(ip_address="10.0.0.2", subnet=subnet, description="Testing")
-        self._create_ipaddress(ip_address="10.0.0.3", subnet=subnet)
-        self._create_ipaddress(ip_address="10.0.0.4", subnet=subnet)
+        subnet = self._create_subnet(subnet='10.0.0.0/24', name='Sample Subnet')
+        self._create_ipaddress(ip_address='10.0.0.1', subnet=subnet, description='Testing')
+        self._create_ipaddress(ip_address='10.0.0.2', subnet=subnet, description='Testing')
+        self._create_ipaddress(ip_address='10.0.0.3', subnet=subnet)
+        self._create_ipaddress(ip_address='10.0.0.4', subnet=subnet)
         out = StringIO()
         call_command('export_subnet', '10.0.0.0/24', stdout=out)
         self.assertIn('Successfully exported 10.0.0.0/24', out.getvalue())
