@@ -24,7 +24,7 @@ class AbstractSubnet(TimeStampedEditableModel):
     description = models.CharField(max_length=100, blank=True)
     master_subnet = models.ForeignKey('self', on_delete=models.CASCADE,
                                       blank=True, null=True,
-                                      related_name="child_subnets")
+                                      related_name='child_subnet_set')
 
     class Meta:
         abstract = True
