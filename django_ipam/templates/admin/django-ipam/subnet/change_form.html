@@ -3,16 +3,20 @@
 {% load static %}
 
 {% block object-tools-items %}
+{% if has_change_permission %}
 <li>
   <a href="{% url 'admin:export_ipaddress' subnet.id %}">
     {% trans "Export" %}
   </a>
 </li>
+{% endif %}
+{% if has_add_permission %}
 <li>
   <a href="{% url 'admin:import_ipaddress' %}">
     {% trans "Import" %}
   </a>
 </li>
+{% endif %}
 {{ block.super }}
 {% endblock %}
 

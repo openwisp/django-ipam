@@ -2,10 +2,12 @@
 {% load i18n admin_urls %}
 
 {% block object-tools-items %}
+{% if has_add_permission %}
 <li>
   <a href="{% url 'admin:import_ipaddress' %}">
     {% trans "Import Subnet/IP Address" %}
   </a>
 </li>
+{% endif %}
 {{ block.super }}
 {% endblock %}
