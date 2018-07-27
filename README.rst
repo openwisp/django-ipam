@@ -40,9 +40,8 @@ Project Goals
 Dependencies
 ============
 
-.. code-block:: shell
-
-    Python 3.4 or greater
+* Python 3.4 or higher
+* Django 2.0 or higher
 
 ------------
 
