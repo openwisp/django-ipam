@@ -114,7 +114,7 @@ class BaseTestAdmin(CreateModelsMixin):
         10.27.1.253,NanoStation M5
         10.27.1.254,Nano Beam 5 19AC"""
         csvfile = SimpleUploadedFile('data.csv', bytes(csv_data, 'utf-8'))
-        response = self.client.post(reverse('admin:import_ipaddress'.format(self.app_name)),
+        response = self.client.post(reverse('admin:ipam_import_subnet'.format(self.app_name)),
                                     {'csvfile': csvfile}, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(str(self.subnet_model.objects.first().subnet), '10.27.1.0/24')
@@ -135,7 +135,7 @@ class BaseTestAdmin(CreateModelsMixin):
         10.27.1.253,NanoStation M5
         10.27.1.254,Nano Beam 5 19AC"""
         csvfile = SimpleUploadedFile('data.csv', bytes(csv_data, 'utf-8'))
-        response = self.client.post(reverse('admin:import_ipaddress'.format(self.app_name)),
+        response = self.client.post(reverse('admin:ipam_import_subnet'.format(self.app_name)),
                                     {'csvfile': csvfile}, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(str(self.ipaddress_model.objects.all()[1].ip_address), '10.27.1.252')
@@ -152,7 +152,7 @@ class BaseTestAdmin(CreateModelsMixin):
         10.27.1.253,NanoStation M5
         10.27.1.254,Nano Beam 5 19AC"""
         csvfile = SimpleUploadedFile('data.txt', bytes(csv_data, 'utf-8'))
-        response = self.client.post(reverse('admin:import_ipaddress'.format(self.app_name)),
+        response = self.client.post(reverse('admin:ipam_import_subnet'.format(self.app_name)),
                                     {'csvfile': csvfile}, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'File type not supported.')
@@ -167,7 +167,7 @@ class BaseTestAdmin(CreateModelsMixin):
         10.27.1.253,NanoStation M5
         10.27.1.254,Nano Beam 5 19AC"""
         csvfile = SimpleUploadedFile('data.csv', bytes(csv_data, 'utf-8'))
-        response = self.client.post(reverse('admin:import_ipaddress'.format(self.app_name)),
+        response = self.client.post(reverse('admin:ipam_import_subnet'.format(self.app_name)),
                                     {'csvfile': csvfile}, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'does not appear to be an IPv4 or IPv6 network')
@@ -182,7 +182,7 @@ class BaseTestAdmin(CreateModelsMixin):
         10.27.1.253,NanoStation M5
         10.27.1.254,Nano Beam 5 19AC"""
         csvfile = SimpleUploadedFile('data.csv', bytes(csv_data, 'utf-8'))
-        response = self.client.post(reverse('admin:import_ipaddress'.format(self.app_name)),
+        response = self.client.post(reverse('admin:ipam_import_subnet'.format(self.app_name)),
                                     {'csvfile': csvfile}, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'does not appear to be an IPv4 or IPv6 address')
@@ -204,10 +204,11 @@ class BaseTestAdmin(CreateModelsMixin):
         10.0.0.4,\r
         """
         csv_data = bytes(csv_data.replace('        ', ''), 'utf-8')
-        response = self.client.get(reverse('admin:export_ipaddress', args=[subnet.id]), follow=True)
+        url = reverse('admin:ipam_export_subnet', args=[subnet.id])
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, csv_data)
 
     def test_importcsv_form(self):
-        response = self.client.get(reverse('admin:import_ipaddress'), follow=True)
+        response = self.client.get(reverse('admin:ipam_import_subnet'))
         self.assertEqual(response.status_code, 200)

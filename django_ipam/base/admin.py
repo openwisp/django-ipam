@@ -65,21 +65,21 @@ class AbstractSubnetAdmin(TimeReadonlyAdminMixin, ModelAdmin):
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
-            re_path(r'^(?P<subnet_id>[^/]+)/export-ipaddress/',
-                    self.export_ipaddress,
-                    name='export_ipaddress'),
-            path('import/', self.import_ipaddress, name='import_ipaddress'),
+            re_path(r'^(?P<subnet_id>[^/]+)/export-subnet/',
+                    self.export_view,
+                    name='ipam_export_subnet'),
+            path('import-subnet/', self.import_view, name='ipam_import_subnet'),
         ]
         return custom_urls + urls
 
-    def export_ipaddress(self, request, subnet_id):
+    def export_view(self, request, subnet_id):
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="ip_address.csv"'
         writer = csv.writer(response)
         Subnet.export_csv(self, subnet_id, writer)
         return response
 
-    def import_ipaddress(self, request):
+    def import_view(self, request):
         form = IpAddressImportForm()
         form_template = 'admin/django-ipam/subnet/import.html'
         subnet_list_url = 'admin:{0}_subnet_changelist'.format(self.app_name)
