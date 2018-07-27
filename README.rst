@@ -9,17 +9,25 @@ django-ipam
 
 ------------
 
+Django-ipam is part of the `OpenWISP project <http://openwisp.org>`_.
+
+.. image:: http://netjsonconfig.openwisp.org/en/latest/_images/openwisp.org.svg
+  :target: http://openwisp.org
+  :scale: 50
+
+------------
+
 .. contents:: **Table of Contents**:
    :backlinks: none
    :depth: 2
 
 ------------
 
-TODO: features we are working on during GSoC 18
-===============================================
+Available Features
+==================
 
 * IPv4 and IPv6 IP address management
-* Section / Subnet management with nested subnets
+* IPv4 and IPv6 Subnet management
 * Automatic free space display for all subnets
 * Visual display for a specific subnet
 * IP request module
@@ -115,6 +123,15 @@ Then run:
 .. code-block:: shell
 
     ./manage.py migrate
+
+------------
+
+Visual Display of subnets
+=========================
+
+Django-ipam provides a graphical representation of a subnet which shows the available free space under any subnet.
+
+.. image:: https://raw.githubusercontent.com/openwisp/django-ipam/master/docs/images/visual-display.png
 
 ------------
 
@@ -362,6 +379,7 @@ Exporting and Importing Subnet
 ==============================
 
 One can easily import and export `Subnet` data and it's Ip Addresses using `django-ipam`.
+This works for both IPv4 and IPv6 types of networks.
 
 Exporting
 #########
@@ -388,7 +406,9 @@ Importing
 #########
 
 Data can be imported via the admin interface or by using a management command.
-The imported data file can be in `.csv`, `.xls` and `.xlsx` format.
+The imported data file can be in `.csv`, `.xls` and `.xlsx` format. While importing
+data for ip addresses, the system checks if the subnet specified in the import file exists or not.
+If the subnet does not exists it will be created while importing data.
 
 From management command
 +++++++++++++++++++++++
