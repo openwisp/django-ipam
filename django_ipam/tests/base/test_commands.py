@@ -22,10 +22,10 @@ class BaseTestCommands(CreateModelsMixin):
 
     def test_import_subnet_command(self):
         with self.assertRaises(CommandError):
-            call_command('import_subnet', file='django_ipam/tests/static/invalid_data.csv')
+            call_command('import_subnet', file=self._get_path('static/invalid_data.csv'))
         self.assertEqual(self.subnet_model.objects.all().count(), 0)
         self.assertEqual(self.ipaddress_model.objects.all().count(), 0)
-        call_command('import_subnet', file='django_ipam/tests/static/import_data.xls')
+        call_command('import_subnet', file=self._get_path('static/import_data.xls'))
         self.assertEqual(self.subnet_model.objects.all().count(), 1)
         self.assertEqual(self.ipaddress_model.objects.all().count(), 8)
         with self.assertRaises(CommandError):

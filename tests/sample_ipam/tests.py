@@ -9,6 +9,7 @@ from django_ipam.tests.test_api import BaseTestApi
 from django_ipam.tests.test_commands import BaseTestCommands
 from django_ipam.tests.test_forms import BaseTestForms, NetworkAddressTestModelForm
 from django_ipam.tests.test_models import BaseTestModel
+from django_ipam.tests.utils import FileMixin
 
 IpAddress = swapper.load_model("django_ipam", "IpAddress")
 Subnet = swapper.load_model("django_ipam", "Subnet")
@@ -39,6 +40,6 @@ class TestApi(BaseTestApi, TestCase):
 
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django-ipam models')
-class TestCommands(BaseTestCommands, TestCase):
+class TestCommands(BaseTestCommands, TestCase, FileMixin):
     subnet_model = Subnet
     ipaddress_model = IpAddress
