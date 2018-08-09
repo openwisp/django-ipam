@@ -67,19 +67,8 @@ class AbstractSubnet(TimeStampedEditableModel):
         ip_address.save()
         return ip_address
 
-    def import_csv(self, file):
-        ipaddress_model = load_model('django_ipam', 'IpAddress')
+    def _read_subnet_data(self, reader):
         subnet_model = load_model('django_ipam', 'Subnet')
-        if file.name.endswith(('.xls', '.xlsx')):
-            book = xlrd.open_workbook(file_contents=file.read())
-            sheet = book.sheet_by_index(0)
-            row = []
-            for row_num in range(sheet.nrows):
-                row.append(sheet.row_values(row_num))
-            reader = iter(row)
-        else:
-            reader = csv.reader(StringIO(file.read().decode('utf-8')),
-                                delimiter=',')
         subnet_name = next(reader)[0].strip()
         subnet_value = next(reader)[0].strip()
         try:
@@ -95,8 +84,10 @@ class AbstractSubnet(TimeStampedEditableModel):
                 subnet.save()
             except ValidationError as e:
                 raise CsvImportException(str(e))
-        next(reader)
-        next(reader)
+        return subnet
+
+    def _read_ipaddress_data(self, reader, subnet):
+        ipaddress_model = load_model('django_ipam', 'IpAddress')
         ipaddress_list = []
         for row in reader:
             if not ipaddress_model.objects.filter(subnet=subnet,
@@ -112,6 +103,22 @@ class AbstractSubnet(TimeStampedEditableModel):
                 ipaddress_list.append(instance)
         for ip in ipaddress_list:
             ip.save()
+
+    def import_csv(self, file):
+        if file.name.endswith(('.xls', '.xlsx')):
+            book = xlrd.open_workbook(file_contents=file.read())
+            sheet = book.sheet_by_index(0)
+            row = []
+            for row_num in range(sheet.nrows):
+                row.append(sheet.row_values(row_num))
+            reader = iter(row)
+        else:
+            reader = csv.reader(StringIO(file.read().decode('utf-8')),
+                                delimiter=',')
+        subnet = self._read_subnet_data(reader)
+        next(reader)
+        next(reader)
+        self._read_ipaddress_data(reader, subnet)
 
     def export_csv(self, subnet_id, writer):
         ipaddress_model = load_model('django_ipam', 'IpAddress')

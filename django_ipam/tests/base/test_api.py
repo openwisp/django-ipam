@@ -4,12 +4,10 @@ from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 
-from .base import CreateModelsMixin
-
 User = get_user_model()
 
 
-class BaseTestApi(CreateModelsMixin):
+class BaseTestApi(object):
     def setUp(self):
         User.objects.create_superuser(username='admin',
                                       password='tester',
@@ -39,11 +37,10 @@ class BaseTestApi(CreateModelsMixin):
     def test_ipv4_request_api(self):
         subnet = self._create_subnet(subnet='10.0.0.0/24')
         self._create_ipaddress(ip_address='10.0.0.1', subnet=subnet)
+        post_data = self._post_data(subnet=str(subnet.id),
+                                    description='Testing')
         response = self.client.post(reverse('ipam:request_ip', args=(subnet.id,)),
-                                    data=json.dumps({
-                                        'subnet': str(subnet.id),
-                                        'description': 'Test ip address'
-                                    }),
+                                    data=post_data,
                                     content_type='application/json')
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data['ip_address'], '10.0.0.2')
@@ -51,32 +48,29 @@ class BaseTestApi(CreateModelsMixin):
     def test_ipv6_request_api(self):
         subnet = self._create_subnet(subnet='fdb6:21b:a477::9f7/64')
         self._create_ipaddress(ip_address='fdb6:21b:a477::1', subnet=subnet)
+        post_data = self._post_data(subnet=str(subnet.id),
+                                    description='Testing')
         response = self.client.post(reverse('ipam:request_ip', args=(subnet.id,)),
-                                    data=json.dumps({
-                                        'subnet': str(subnet.id),
-                                        'description': 'Test ip address',
-                                    }),
+                                    data=post_data,
                                     content_type='application/json')
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data['ip_address'], 'fdb6:21b:a477::2')
 
     def test_unvailable_request_api(self):
         subnet = self._create_subnet(subnet='10.0.0.0/32')
+        post_data = self._post_data(subnet=str(subnet.id),
+                                    description='Testing')
         response = self.client.post(reverse('ipam:request_ip', args=(subnet.id,)),
-                                    data=json.dumps({
-                                        'subnet': str(subnet.id),
-                                        'description': 'Test ip address'
-                                    }),
+                                    data=post_data,
                                     content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, None)
 
     def test_create_subnet_api(self):
+        post_data = self._post_data(subnet='10.0.0.0/32',
+                                    description='Testing')
         response = self.client.post(reverse('ipam:subnet_list_create'),
-                                    data=json.dumps({
-                                        'subnet': '10.0.0.0/32',
-                                        'description': 'Test Subnet'
-                                    }),
+                                    data=post_data,
                                     content_type='application/json')
         self.assertEqual(response.status_code, 201)
         self.assertEqual(str(self.subnet_model.objects.first().subnet), '10.0.0.0/32')
@@ -103,12 +97,11 @@ class BaseTestApi(CreateModelsMixin):
 
     def test_create_ip_address_api(self):
         subnet_id = self._create_subnet(subnet='10.0.0.0/24').id
+        post_data = self._post_data(ip_address='10.0.0.2',
+                                    subnet=str(subnet_id),
+                                    description='Testing')
         response = self.client.post(reverse('ipam:list_create_ip_address', args=(subnet_id,)),
-                                    data=json.dumps({
-                                        'ip_address': '10.0.0.2',
-                                        'subnet': str(subnet_id),
-                                        'description': 'Test Subnet'
-                                    }),
+                                    data=post_data,
                                     content_type='application/json')
         self.assertEqual(response.status_code, 201)
         self.assertEqual(str(self.ipaddress_model.objects.first().ip_address), '10.0.0.2')
