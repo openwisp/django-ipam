@@ -1,13 +1,13 @@
+import json
+
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 
-from .base import CreateModelsMixin
-
 User = get_user_model()
 
 
-class BaseTestAdmin(CreateModelsMixin):
+class BaseTestAdmin(object):
     def setUp(self):
         User.objects.create_superuser(username='admin',
                                       password='tester',
@@ -16,16 +16,14 @@ class BaseTestAdmin(CreateModelsMixin):
 
     def test_ipaddress_invalid_entry(self):
         subnet = self._create_subnet(subnet='10.0.0.0/24', description='Sample Subnet')
-        post_data = {
-            'ip_address': '12344',
-            'subnet': subnet.id,
-            'created_0': '2017-08-08',
-            'created_1': '15:16:10',
-            'modified_0': '2017-08-08',
-            'modified_1': '15:16:10',
-        }
+        post_data = self._post_data(ip_address='1234',
+                                    subnet=str(subnet.id),
+                                    created_0='2017-08-08',
+                                    created_1='15:16:10',
+                                    modified_0='2017-08-08',
+                                    modified_1='15:16:10')
         response = self.client.post(reverse('admin:{0}_ipaddress_add'.format(self.app_name)),
-                                    post_data, follow=True)
+                                    json.loads(post_data), follow=True)
         self.assertContains(response, 'ok')
         self.assertContains(response, 'Enter a valid IPv4 or IPv6 address.')
 
@@ -56,16 +54,14 @@ class BaseTestAdmin(CreateModelsMixin):
         self.assertContains(response, '<h3>Used IP address</h3>')
 
     def test_subnet_invalid_entry(self):
-        post_data = {
-            'subnet': '12344',
-            'created_0': '2017-08-08',
-            'created_1': '15:16:10',
-            'modified_0': '2017-08-08',
-            'modified_1': '15:16:10',
-        }
+        post_data = self._post_data(subnet=1234,
+                                    created_0='2017-08-08',
+                                    created_1='15:16:10',
+                                    modified_0='2017-08-08',
+                                    modified_1='15:16:10')
 
         response = self.client.post(reverse('admin:{0}_subnet_add'.format(self.app_name)),
-                                    post_data, follow=True)
+                                    json.loads(post_data), follow=True)
         self.assertContains(response, 'ok')
         self.assertContains(response, 'Enter a valid CIDR address.')
 
@@ -79,31 +75,27 @@ class BaseTestAdmin(CreateModelsMixin):
 
     def test_ipaddress_response(self):
         subnet = self._create_subnet(subnet='10.0.0.0/24', description='Sample Subnet')
-        post_data = {
-            'ip_address': '10.0.0.1',
-            'subnet': subnet.id,
-            'created_0': '2017-08-08',
-            'created_1': '15:16:10',
-            'modified_0': '2017-08-08',
-            'modified_1': '15:16:10',
-        }
+        post_data = self._post_data(ip_address='10.0.0.1',
+                                    subnet=str(subnet.id),
+                                    created_0='2017-08-08',
+                                    created_1='15:16:10',
+                                    modified_0='2017-08-08',
+                                    modified_1='15:16:10')
         response = self.client.post(reverse('admin:{0}_ipaddress_add'.format(self.app_name)),
-                                    post_data, follow=True)
+                                    json.loads(post_data), follow=True)
         self.assertContains(response, 'ok')
 
     def test_ipaddress_popup_response(self):
         subnet = self._create_subnet(subnet='10.0.0.0/24', description='Sample Subnet')
-        post_data = {
-            'ip_address': '10.0.0.1',
-            'subnet': subnet.id,
-            'created_0': '2017-08-08',
-            'created_1': '15:16:10',
-            'modified_0': '2017-08-08',
-            'modified_1': '15:16:10',
-            '_popup': '1',
-        }
+        post_data = self._post_data(ip_address='10.0.0.1',
+                                    subnet=str(subnet.id),
+                                    created_0='2017-08-08',
+                                    created_1='15:16:10',
+                                    modified_0='2017-08-08',
+                                    modified_1='15:16:10',
+                                    _popup=1)
         response = self.client.post(reverse('admin:{0}_ipaddress_add'.format(self.app_name)),
-                                    post_data)
+                                    json.loads(post_data))
         self.assertContains(response, 'opener.dismissAddAnotherPopup(window);')
 
     def test_csv_upload(self):

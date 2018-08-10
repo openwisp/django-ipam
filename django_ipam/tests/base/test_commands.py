@@ -2,10 +2,8 @@ from io import StringIO
 
 from django.core.management import CommandError, call_command
 
-from .base import CreateModelsMixin
 
-
-class BaseTestCommands(CreateModelsMixin):
+class BaseTestCommands(object):
     def test_export_subnet_command(self):
         subnet = self._create_subnet(subnet='10.0.0.0/24', name='Sample Subnet')
         self._create_ipaddress(ip_address='10.0.0.1', subnet=subnet, description='Testing')

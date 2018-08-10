@@ -2,10 +2,8 @@ from ipaddress import IPv4Network, IPv6Network
 
 from django.core.exceptions import ValidationError
 
-from .base import CreateModelsMixin
 
-
-class BaseTestModel(CreateModelsMixin):
+class BaseTestModel(object):
     def test_ip_address_string_representation(self):
         ipaddress = self.ipaddress_model(ip_address='entry ip_address')
         self.assertEqual(str(ipaddress), ipaddress.ip_address)

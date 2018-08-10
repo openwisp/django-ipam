@@ -65,8 +65,11 @@ class BaseRequestIPView(CreateAPIView):
     permission_classes = (DjangoModelPermissions,)
 
     def post(self, request, *args, **kwargs):
+        options = {
+            'description': request.data.get("description")
+        }
         subnet = get_object_or_404(self.subnet_model, pk=kwargs["subnet_id"])
-        ip_address = subnet.request_ip(dict(description=request.data.get("description")))
+        ip_address = subnet.request_ip(options)
         if ip_address:
             serializer = IpAddressSerializer(ip_address)
             headers = self.get_success_headers(serializer.data)
@@ -84,7 +87,7 @@ class BaseImportSubnetView(CreateAPIView):
         if not file.name.endswith(('.csv', '.xls', '.xlsx')):
             return Response({'error': _('File type not supported.')}, status=400)
         try:
-            self.subnet_model.import_csv(self, file)
+            self.subnet_model().import_csv(file)
         except CsvImportException as e:
             return Response({'error': _(str(e))}, status=400)
         return Response({'detail': _('Data imported successfully.')})
@@ -99,5 +102,5 @@ class BaseExportSubnetView(CreateAPIView):
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="ip_address.csv"'
         writer = csv.writer(response)
-        self.subnet_model.export_csv(self, kwargs['subnet_id'], writer)
+        self.subnet_model().export_csv(kwargs['subnet_id'], writer)
         return response

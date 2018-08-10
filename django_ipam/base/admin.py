@@ -76,7 +76,7 @@ class AbstractSubnetAdmin(TimeReadonlyAdminMixin, ModelAdmin):
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="ip_address.csv"'
         writer = csv.writer(response)
-        Subnet.export_csv(self, subnet_id, writer)
+        Subnet().export_csv(subnet_id, writer)
         return response
 
     def import_view(self, request):
@@ -97,7 +97,7 @@ class AbstractSubnetAdmin(TimeReadonlyAdminMixin, ModelAdmin):
                     messages.error(request, _('File type not supported.'))
                     return render(request, form_template, context)
                 try:
-                    Subnet.import_csv(self, file)
+                    Subnet().import_csv(file)
                 except CsvImportException as e:
                     messages.error(request, str(e))
                     return render(request, form_template, context)

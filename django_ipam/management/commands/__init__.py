@@ -20,7 +20,7 @@ class BaseImportSubnetCommand(BaseCommand):
                 raise CommandError(_('File type not supported'))
             with open(file, 'rb+') as csvfile:
                 try:
-                    self.subnet_model.import_csv(self, csvfile)
+                    self.subnet_model().import_csv(csvfile)
                 except CsvImportException as e:
                     raise CommandError(str(e))
             csvfile.close()
