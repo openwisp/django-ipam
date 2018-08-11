@@ -56,6 +56,12 @@ Dependencies
 Install Development Version
 ===========================
 
+Install for development version:
+
+.. code-block:: shell
+
+    pip install -r requirements-test.txt
+
 Install the development version using the following commands:
 
 .. code-block:: shell
