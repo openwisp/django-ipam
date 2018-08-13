@@ -75,6 +75,16 @@ class BaseTestApi(object):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(str(self.subnet_model.objects.first().subnet), '10.0.0.0/32')
 
+    def test_overlapping_subnet(self):
+        post_data = self._post_data(subnet='10.20.0.0/24',
+                                    name='Subnet',
+                                    description='Sample',
+                                    master_subnet='10.20.0.0/24')
+        response = self.client.post(reverse('ipam:subnet_list_create'),
+                                    data=post_data,
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+
     def test_read_subnet_api(self):
         subnet_id = self._create_subnet(subnet='fdb6:21b:a477::/64').id
         response = self.client.get(reverse('ipam:subnet', args=(subnet_id,)))
