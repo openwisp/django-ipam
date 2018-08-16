@@ -18,12 +18,22 @@ class IpAddressSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ('created', 'modified')
 
+    def validate(self, data):
+        instance = self.instance or self.Meta.model(**data)
+        instance.full_clean()
+        return data
+
 
 class SubnetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subnet
         fields = '__all__'
         read_only_fields = ('created', 'modified')
+
+    def validate(self, data):
+        instance = self.instance or self.Meta.model(**data)
+        instance.full_clean()
+        return data
 
 
 class ImportSubnetSerializer(serializers.Serializer):
