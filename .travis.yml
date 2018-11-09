@@ -23,7 +23,7 @@ before_install:
   - jslint ./django_ipam/static/django-ipam/js/*.js
 
 install:
-  - pip install "django>=2.0,<2.1"
+  - pip install "django>=2.0,<2.2"
   - python setup.py -q develop
 
 before_script:
