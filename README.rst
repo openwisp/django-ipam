@@ -6,6 +6,11 @@ django-ipam
 
 .. image:: https://coveralls.io/repos/openwisp/django-ipam/badge.svg
   :target: https://coveralls.io/r/openwisp/django-ipam
+  
+.. image:: https://requires.io/github/openwisp/django-ipam/requirements.svg?branch=master
+  :target: https://requires.io/github/openwisp/django-ipam/requirements/?branch=master
+  :alt: Requirements Status
+
 
 ------------
 
