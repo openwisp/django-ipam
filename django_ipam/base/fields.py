@@ -27,7 +27,7 @@ class IpNetworkFormField(forms.Field):
 
         try:
             network = ip_network(value, strict=False)
-        except ValueError as e:
+        except ValueError:
             raise ValidationError(self.default_error_messages['invalid'])
         return network
 
