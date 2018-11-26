@@ -2,7 +2,10 @@ from ipaddress import IPv4Network, IPv6Network
 
 
 def patch_ipaddress_lib():
-
+    """
+    On python < 3.7, the ipaddress library does not have
+    the method ``subnet_of``, so we add it via monkey patching
+    """
     def _is_subnet_of(a, b):
         try:
             # Always false if one is v4 and the other is v6
@@ -15,12 +18,12 @@ def patch_ipaddress_lib():
                             "between %s and %s".format(a, b))
 
     def subnet_of(self, other):
-        """ Return True if this network is a subnet of other"""
+        """ Return True if this network is a subnet of other """
         return self._is_subnet_of(self, other)
 
-    if 'subnet_of' not in IPv4Network.__dict__:  # in case of python version <3.7
+    if not hasattr(IPv4Network, 'subnet_of'):
         IPv4Network._is_subnet_of = staticmethod(_is_subnet_of)
         IPv4Network.subnet_of = subnet_of
-    if 'subnet_of' not in IPv6Network.__dict__:  # in case of python version <3.7
+    if not hasattr(IPv6Network, 'subnet_of'):
         IPv6Network._is_subnet_of = staticmethod(_is_subnet_of)
         IPv6Network.subnet_of = subnet_of
