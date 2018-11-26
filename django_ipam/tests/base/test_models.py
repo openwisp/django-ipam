@@ -131,6 +131,17 @@ class BaseTestModel(object):
         if failed:
             self.fail('ValidationError not raised')
 
+    def test_invalid_master_subnet(self):
+        failed = True
+        subnet = self._create_subnet(subnet='10.20.0.0/24')
+        try:
+            self._create_subnet(subnet='192.168.2.0/24', master_subnet=subnet)
+        except ValidationError as e:
+            self.assertTrue(e.message_dict['master_subnet'] == ['Invalid master subnet'])
+            failed = False
+        if failed:
+            self.fail('ValidationError not raised')
+
     def test_save_none_subnet_fails(self):
         failed = True
         try:

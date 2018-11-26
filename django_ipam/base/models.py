@@ -45,6 +45,10 @@ class AbstractSubnet(TimeStampedEditableModel):
                 raise ValidationError({
                     'subnet': _('Subnet overlaps with %s') % subnet['subnet']
                 })
+        if self.master_subnet and not ip_network(self.subnet).subnet_of(ip_network(self.master_subnet)):
+            raise ValidationError({
+                'master_subnet': _('Invalid master subnet')
+            })
 
     def get_first_available_ip(self):
         ipaddress_set = [ip.ip_address for ip in self.ipaddress_set.all()]
