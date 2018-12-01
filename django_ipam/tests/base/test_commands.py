@@ -1,3 +1,5 @@
+import glob
+import os
 from io import StringIO
 
 from django.core.management import CommandError, call_command
@@ -30,3 +32,8 @@ class BaseTestCommands(object):
             call_command('import_subnet', file='invalid.pdf')
         with self.assertRaises(CommandError):
             call_command('import_subnet', file='invalid_path.csv')
+
+    def tearDownClass():
+        files = glob.glob('data_[a-z0-9]*.csv')
+        for file in files:
+            os.remove(file)
