@@ -17,8 +17,8 @@ env:
 
 before_install:
   - pip install --no-cache-dir -U -r requirements-test.txt
-  - ./runflake8
-  - ./runisort
+  - flake8
+  - isort --check-only --recursive --diff .
   - ./runcheckmigration
   - npm install -g jslint
   - jslint ./django_ipam/static/django-ipam/js/*.js
