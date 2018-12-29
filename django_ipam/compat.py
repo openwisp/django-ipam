@@ -14,7 +14,8 @@ def patch_ipaddress_lib():
             return (b.network_address <= a.network_address and
                     b.broadcast_address >= a.broadcast_address)
         except AttributeError:
-            raise TypeError("Unable to test subnet containment")
+            raise TypeError("Unable to test subnet containment "
+                            "between %s and %s" % (a, b))
 
     def subnet_of(self, other):
         """ Return True if this network is a subnet of other """

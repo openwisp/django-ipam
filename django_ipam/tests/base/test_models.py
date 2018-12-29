@@ -187,3 +187,23 @@ class BaseTestModel(object):
         instance = self._create_subnet(subnet='2001:db8::0/32')
         instance = self.subnet_model.objects.get(pk=instance.pk)
         self.assertIsInstance(instance.subnet, IPv6Network)
+
+    def test_incompatible_ipadresses(self):
+        instance = self._create_subnet(subnet='10.1.2.0/24')
+        try:
+            self._create_subnet(subnet='2001:db8::0/32', master_subnet=instance)
+        except TypeError as err:
+            self.assertEqual(str(err), '2001:db8::/32 and 10.1.2.0/24 are not of the same version')
+        else:
+            self.fail('TypeError not raised')
+
+    def test_ipadresses_missing_attribute(self):
+        instance = self._create_subnet(subnet='10.1.2.0/24')
+        instance2 = self._create_subnet(subnet='10.1.3.0/25')
+        del instance.subnet.network_address
+        try:
+            instance2.subnet.subnet_of(instance.subnet)
+        except AttributeError as err:
+            self.assertIn(str(err), '\'IPv4Network\' object has no attribute \'network_address\'')
+        else:
+            self.fail('TypeError not raised')
