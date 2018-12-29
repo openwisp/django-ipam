@@ -142,6 +142,24 @@ class BaseTestModel(object):
         if failed:
             self.fail('ValidationError not raised')
 
+    def test_valid_subnet_relation_tree(self):
+        subnet1 = self._create_subnet(subnet='12.0.56.0/24')
+        try:
+            subnet2 = self._create_subnet(subnet='12.0.56.0/25', master_subnet=subnet1)
+            self._create_subnet(subnet='12.0.56.0/26', master_subnet=subnet2)
+        except ValidationError:
+            self.fail('Correct master_subnet not accepted')
+
+    def test_invalid_subnet_relation_tree(self):
+        subnet1 = self._create_subnet(subnet='12.0.56.0/24')
+        self._create_subnet(subnet='12.0.56.0/25', master_subnet=subnet1)
+        try:
+            self._create_subnet(subnet='12.0.56.0/26', master_subnet=subnet1)
+        except ValidationError as e:
+            self.assertEqual(e.message_dict['subnet'], ['Subnet overlaps with 12.0.56.0/25'])
+        else:
+            self.fail('ValidationError not raised')
+
     def test_save_none_subnet_fails(self):
         failed = True
         try:

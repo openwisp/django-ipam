@@ -38,17 +38,28 @@ class AbstractSubnet(TimeStampedEditableModel):
     def clean(self):
         if not self.subnet:
             return
+        allowed_master = None
         for subnet in load_model('django_ipam', 'Subnet').objects.filter().values():
             if self.id == subnet['id']:
                 continue
             if ip_network(self.subnet).overlaps(subnet['subnet']):
+                if not self.master_subnet and not subnet['subnet'].subnet_of(ip_network(self.subnet)):
+                    raise ValidationError({
+                        'subnet': _('Subnet overlaps with %s') % subnet['subnet']
+                    })
+                if not allowed_master or subnet['subnet'].subnet_of(allowed_master):
+                    allowed_master = subnet['subnet']
+
+        if self.master_subnet:
+            if not ip_network(self.subnet).subnet_of(ip_network(self.master_subnet)):
                 raise ValidationError({
-                    'subnet': _('Subnet overlaps with %s') % subnet['subnet']
+                    'master_subnet': _('Invalid master subnet')
                 })
-        if self.master_subnet and not ip_network(self.subnet).subnet_of(ip_network(self.master_subnet)):
-            raise ValidationError({
-                'master_subnet': _('Invalid master subnet')
-            })
+            if ip_network(self.master_subnet) != allowed_master and not \
+                    allowed_master.subnet_of(ip_network(self.subnet)):
+                raise ValidationError({
+                    'subnet': _('Subnet overlaps with %s') % allowed_master
+                })
 
     def get_first_available_ip(self):
         ipaddress_set = [ip.ip_address for ip in self.ipaddress_set.all()]
