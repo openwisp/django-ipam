@@ -24,6 +24,7 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+Pipfile
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -105,3 +106,9 @@ ENV/
 
 # Generated CSV files
 data_*.csv
+
+# nodejs
+node_modules/
+
+# Editor
+.vscode

@@ -6,6 +6,8 @@ cache: pip
 
 python:
   - "3.5"
+  - "3.6"
+  - "3.7"
 
 branches:
   only:
@@ -34,7 +36,7 @@ before_script:
       echo $OUTPUT
       echo $OUTPUT | grep "No changes detected"
     fi
-    
+
 script:
   - coverage run --source=django_ipam runtests.py
 
