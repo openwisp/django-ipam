@@ -61,8 +61,27 @@
     {% endif %}
   </div>
   {% endif %}
-{% endblock %}
+{% if total.has_other_pages %}
+<div class="pagination">
+    {% if total.has_previous %}
+        <a href="?page=1"><<</a>
+        <a href="?page={{ total.previous_page_number }}"><</a>
+    {% endif %}
+        {% for num in total.paginator.page_range %}
+            {% if total.number == num %}
+                <strong>{{ num }}</strong>
+            {% elif num > total.number|add:'-3' and num < total.number|add:'3' %}
+                {{ num }}
 
+            {% endif %}
+        {% endfor %}
+{% if total.has_next %}
+    <a href="?page={{ total.next_page_number }}">></a>
+    <a href="?page={{ total.paginator.num_pages }}">>></a>
+{% endif %}
+</div>
+{% endif %}
+{% endblock %}
 {% block admin_change_form_document_ready %}
   {{ block.super }}
   <script type="text/javascript" src="{% static 'django-ipam/js/minified/plotly.min.js' %}"></script>

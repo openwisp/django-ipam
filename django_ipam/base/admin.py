@@ -8,6 +8,7 @@ from django.contrib.admin import ModelAdmin
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import path, re_path, reverse
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils.translation import gettext_lazy as _
 from openwisp_utils.admin import TimeReadonlyAdminMixin
 
@@ -39,6 +40,18 @@ class AbstractSubnetAdmin(TimeReadonlyAdminMixin, ModelAdmin):
             available = len(total) - used
             labels = ['Used', 'Available']
             values = [used, available]
+            try:
+                page = request.GET.get('page')
+                try:
+                    paginator = Paginator(total, 255)
+                    total = paginator.get_page(page)
+                except PageNotAnInteger:
+                    total = paginator.page(1)
+                except EmptyPage:
+                    total = paginator.page(paginator.num_pages)
+            except AttributeError:
+                pass
+
             extra_context = {'labels': labels,
                              'values': values,
                              'total': total,
