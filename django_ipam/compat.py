@@ -10,12 +10,11 @@ def patch_ipaddress_lib():
         try:
             # Always false if one is v4 and the other is v6
             if a._version != b._version:
-                raise TypeError("%s and %s are not of the same version".format((a, b)))
+                raise TypeError("%s and %s are not of the same version" % (a, b))
             return (b.network_address <= a.network_address and
-                    b.network_address >= a.broadcast_address)
+                    b.broadcast_address >= a.broadcast_address)
         except AttributeError:
-            raise TypeError("Unable to test subnet containment"
-                            "between %s and %s".format(a, b))
+            raise TypeError("Unable to test subnet containment")
 
     def subnet_of(self, other):
         """ Return True if this network is a subnet of other """
