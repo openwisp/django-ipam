@@ -33,7 +33,10 @@ class AbstractSubnet(TimeStampedEditableModel):
         ]
 
     def __str__(self):
-        return str(self.subnet)
+        if self.name:
+            return '{0} {1}'.format(self.name, str(self.subnet))
+        else:
+            return str(self.subnet)
 
     def clean(self):
         if not self.subnet:
