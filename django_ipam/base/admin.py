@@ -23,6 +23,7 @@ class AbstractSubnetAdmin(TimeReadonlyAdminMixin, ModelAdmin):
     change_list_template = 'admin/django-ipam/subnet/change_list.html'
     app_name = 'django_ipam'
     list_display = ('name', 'subnet', 'master_subnet', 'description')
+    autocomplete_fields = ['master_subnet']
     search_fields = ['subnet', 'name']
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
@@ -123,6 +124,7 @@ class AbstractIpAddressAdmin(TimeReadonlyAdminMixin, ModelAdmin):
     list_display = ('ip_address', 'subnet', 'description')
     list_filter = ('subnet',)
     search_fields = ['ip_address']
+    autocomplete_fields = ['subnet']
 
     class Media:
         js = ('django-ipam/js/ip-request.js',)
