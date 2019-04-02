@@ -91,6 +91,10 @@ class BaseTestModel(object):
         subnet = self.subnet_model(subnet='entry subnet')
         self.assertEqual(str(subnet), str(subnet.subnet))
 
+    def test_subnet_string_representation_with_name(self):
+        subnet = self.subnet_model(subnet='entry subnet', name='test1')
+        self.assertEqual(str(subnet), '{0} {1}'.format(subnet.name, str(subnet.subnet)))
+
     def test_valid_cidr_field(self):
         try:
             self._create_subnet(subnet='22.0.0.0/24')
