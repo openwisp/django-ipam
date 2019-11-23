@@ -1,5 +1,6 @@
 language: python
 sudo: false
+dist: bionic
 
 cache: pip
 
@@ -24,7 +25,7 @@ before_install:
   - jslint ./django_ipam/static/django-ipam/js/*.js
 
 install:
-  - pip install "django>=2.0,<2.2"
+  - pip install "django>=2.0,<2.3"
   - python setup.py -q develop
 
 before_script:
