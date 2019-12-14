@@ -1,5 +1,0 @@
-#!/bin/bash
-set -e
-checkmigrations --migration-path ./django_ipam/migrations/ || exit 1
-checkmigrations --migration-path ./tests/sample_ipam/migrations/ || exit 1
-
