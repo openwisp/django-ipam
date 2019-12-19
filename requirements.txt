@@ -1,5 +1,5 @@
-django>=1.11,<2.2
+django>=1.11,<2.3
 swapper>=1.1.0
 openwisp-utils>=0.2,<0.3
-djangorestframework>=3.7,<3.10
+djangorestframework>=3.7,<3.11
 xlrd>=1.1.0
