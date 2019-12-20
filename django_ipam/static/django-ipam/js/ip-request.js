@@ -4,16 +4,14 @@
     'use strict';
 
     function getAvailableIp() {
-        var e = document.getElementById('id_subnet');
-        var subnet = e.options[e.selectedIndex].value;
         $.ajax({
             type: 'GET',
-            url: django.ipamGetFirstAvailableIpUrl.replace('0000', subnet),
+            url: django.ipamGetFirstAvailableIpUrl.replace('0000', $('#id_subnet').val()),
             success: function (res) {
-                if (res === '') {
+                if (!res) {
                     alert('No IP address available');
                 }
-                document.getElementById('id_ip_address').value = res;
+                $('#id_ip_address').val(res);
             }
         });
     }
@@ -32,7 +30,7 @@
             if (getURLParameter('_popup') === '1') {
                 return;
             }
-            if (subnet.val() === '') {
+            if (!subnet.val()) {
                 ip_address.hide();
                 description.hide();
             } else {
