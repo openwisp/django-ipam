@@ -107,7 +107,8 @@ class AbstractSubnetAdmin(TimeReadonlyAdminMixin, ModelAdmin):
         return render(request, form_template, context)
 
     class Media:
-        js = ('django-ipam/js/custom.js',)
+        js = ('admin/js/jquery.init.js',
+              'django-ipam/js/custom.js',)
         css = {'all': ('django-ipam/css/admin.css',)}
 
 
@@ -127,7 +128,8 @@ class AbstractIpAddressAdmin(TimeReadonlyAdminMixin, ModelAdmin):
     autocomplete_fields = ['subnet']
 
     class Media:
-        js = ('django-ipam/js/ip-request.js',)
+        js = ('admin/js/jquery.init.js',
+              'django-ipam/js/ip-request.js',)
 
     def get_extra_context(self):
         url = reverse('ipam:get_first_available_ip', args=['0000'])
