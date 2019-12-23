@@ -30,8 +30,30 @@ class AbstractSubnetAdmin(TimeReadonlyAdminMixin, ModelAdmin):
         instance = Subnet.objects.get(pk=object_id)
         ipaddress_add_url = 'admin:{0}_ipaddress_add'.format(self.app_name)
         ipaddress_change_url = 'admin:{0}_ipaddress_change'.format(self.app_name)
+        subnet_change_url = 'admin:{0}_subnet_change'.format(self.app_name)
         if request.GET.get('_popup'):
             return super(AbstractSubnetAdmin, self).change_view(request, object_id, form_url, extra_context)
+        # Find root master_subnet for subnet tree
+        instance_root = instance
+        while instance_root.master_subnet:
+            instance_root = Subnet.objects.get(subnet=instance_root.master_subnet.subnet)
+        # Get instances for all subnets for root master_subnet
+        instance_subnets = Subnet.objects.filter(subnet=instance_root.subnet) \
+                                         .values("master_subnet", "id",
+                                                 "name", "subnet")
+        # Make subnet tree
+        collection_depth = 0
+        subnet_tree = [instance_subnets]
+        while instance_subnets:
+            instance_subnets = Subnet.objects.none()
+            for slave_subnet in subnet_tree[collection_depth]:
+                instance_subnets = \
+                    instance_subnets | Subnet.objects.filter(master_subnet=slave_subnet["id"]) \
+                                                     .values("master_subnet", "id",
+                                                             "name", "subnet")
+            subnet_tree.append(instance_subnets)
+            collection_depth += 1
+
         if type(instance.subnet) == IPv4Network:
             show_visual = True
             total = [host for host in instance.subnet.hosts()]
@@ -47,7 +69,11 @@ class AbstractSubnetAdmin(TimeReadonlyAdminMixin, ModelAdmin):
                              'used_ip': used_ip,
                              'show_visual': show_visual,
                              'ipaddress_add_url': ipaddress_add_url,
-                             'ipaddress_change_url': ipaddress_change_url}
+                             'ipaddress_change_url': ipaddress_change_url,
+                             'subnet_change_url': subnet_change_url,
+                             'show_subnet_tree': True,
+                             'subnet_tree': subnet_tree}
+
         elif type(instance.subnet) == IPv6Network:
             used_ip = [ip for ip in instance.ipaddress_set.all()]
             used = len(used_ip)
@@ -59,7 +85,10 @@ class AbstractSubnetAdmin(TimeReadonlyAdminMixin, ModelAdmin):
                              'used_ip': used_ip,
                              'subnet': instance,
                              'ipaddress_add_url': ipaddress_add_url,
-                             'ipaddress_change_url': ipaddress_change_url}
+                             'ipaddress_change_url': ipaddress_change_url,
+                             'subnet_change_url': subnet_change_url,
+                             'show_subnet_tree': True,
+                             'subnet_tree': subnet_tree}
 
         return super(AbstractSubnetAdmin, self).change_view(request, object_id, form_url, extra_context)
 
@@ -108,8 +137,11 @@ class AbstractSubnetAdmin(TimeReadonlyAdminMixin, ModelAdmin):
 
     class Media:
         js = ('admin/js/jquery.init.js',
-              'django-ipam/js/custom.js',)
-        css = {'all': ('django-ipam/css/admin.css',)}
+              'django-ipam/js/custom.js',
+              'django-ipam/js/minified/jstree.min.js',
+              'django-ipam/js/minified/plotly.min.js',)
+        css = {'all': ('django-ipam/css/admin.css',
+                       'django-ipam/css/minified/jstree.min.css',)}
 
 
 class IpAddressAdminForm(forms.ModelForm):

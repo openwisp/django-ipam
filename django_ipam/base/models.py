@@ -54,11 +54,11 @@ class AbstractSubnet(TimeStampedEditableModel):
                     allowed_master = subnet['subnet']
 
         if self.master_subnet:
-            if not ip_network(self.subnet).subnet_of(ip_network(self.master_subnet)):
+            if not ip_network(self.subnet).subnet_of(ip_network(self.master_subnet.subnet)):
                 raise ValidationError({
                     'master_subnet': _('Invalid master subnet')
                 })
-            if ip_network(self.master_subnet) != allowed_master and not \
+            if ip_network(self.master_subnet.subnet) != allowed_master and not \
                     allowed_master.subnet_of(ip_network(self.subnet)):
                 raise ValidationError({
                     'subnet': _('Subnet overlaps with %s') % allowed_master

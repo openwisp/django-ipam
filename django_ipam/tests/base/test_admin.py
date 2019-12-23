@@ -206,3 +206,16 @@ class BaseTestAdmin(object):
     def test_importcsv_form(self):
         response = self.client.get(reverse('admin:ipam_import_subnet'))
         self.assertEqual(response.status_code, 200)
+
+    def test_hierarchy_tree(self):
+        subnet_root = self._create_subnet(subnet='11.0.0.0/23', name='Root')
+        subnet_child = self._create_subnet(subnet='11.0.0.0/24', name='Child#1', master_subnet=subnet_root)
+        self._create_subnet(subnet='11.0.1.0/24', name='Child#2', master_subnet=subnet_root)
+        self._create_subnet(subnet='11.0.0.0/25', name='Grantchild#1', master_subnet=subnet_child)
+        url = reverse('admin:{0}_subnet_change'.format(self.app_name), args=[subnet_child.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "11.0.0.0/23 (Root)")
+        self.assertContains(response, "11.0.0.0/24 (Child#1)")
+        self.assertContains(response, "11.0.1.0/24 (Child#2)")
+        self.assertContains(response, "11.0.0.0/25 (Grantchild#1)")

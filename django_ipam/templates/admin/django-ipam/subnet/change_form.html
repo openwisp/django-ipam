@@ -21,6 +21,10 @@
 {% endblock %}
 
 {% block after_related_objects %}
+  {% if show_subnet_tree %}
+    <h2>{% trans 'Network Hierarchical View' %}</h2>
+    <div id="jstree"></div>
+  {% endif %}
   <div id="graph"></div>
   {% if show_visual %}
   <div>
@@ -65,8 +69,36 @@
 
 {% block admin_change_form_document_ready %}
   {{ block.super }}
-  <script type="text/javascript" src="{% static 'django-ipam/js/minified/plotly.min.js' %}"></script>
   <script type="text/javascript">
+    // Nested Subnet Tree
+    var current_subnet = "{{ subnet.id }}";
+    subnet_tree = [];
+    subnet_tree.push(
+    {% for subnet_queryset in subnet_tree %}
+      {% for subnet_item in subnet_queryset %}
+          {subnet_id: "{{ subnet_item.id }}", 
+          subnet_tree_item: "{{ subnet_item.subnet }} ({{ subnet_item.name }})", 
+          master_subnet: "{{ subnet_item.master_subnet }}",
+          url: "{% url subnet_change_url subnet_item.id %}",
+        },
+      {% endfor %}
+    {% endfor %}
+    );
+    subnet_tree[0]['master_subnet'] = "jstree";
+    for (item in subnet_tree) {
+      var parent_element = document.getElementById(subnet_tree[item]["master_subnet"]),
+          subnet_list = document.createElement("ul"),
+          subnet_item = document.createElement("li"),
+          subnet_href = document.createElement("a"),
+          subnet_node = document.createTextNode(subnet_tree[item]["subnet_tree_item"]);
+      subnet_item.id = subnet_tree[item]["subnet_id"];
+      subnet_href.href = subnet_tree[item]["url"];
+      subnet_list.appendChild(subnet_item);
+      subnet_item.appendChild(subnet_href);
+      subnet_href.appendChild(subnet_node);
+      parent_element.appendChild(subnet_list);
+    }
+    // Ipam Graph / Visual
     var data = [],
         layout = {},
         vals = {{ values|safe }}
