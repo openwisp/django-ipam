@@ -20,6 +20,16 @@ def get_install_requires():
     return requirements
 
 
+def check_sqlite_version():
+    from django.core.exceptions import ImproperlyConfigured
+    try:
+        import sqlite3
+        if sqlite3.sqlite_version_info < (3, 12, 1):
+            raise ImportError
+    except ImportError:
+        raise ImproperlyConfigured('SQLite 3.12.1 or later is required (found %s).' % sqlite3.sqlite_version)
+
+
 setup(
     name='django-ipam',
     version=get_version(),
@@ -45,3 +55,5 @@ setup(
         'Programming Language :: Python :: 3.4',
     ],
 )
+
+check_sqlite_version()
