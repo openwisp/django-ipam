@@ -20,8 +20,6 @@ env:
 
 before_install:
   - pip install --no-cache-dir -U -r requirements-test.txt
-  - openwisp-utils-qa-checks --migration-path "./django_ipam/migrations/"
-  - openwisp-utils-qa-checks --migration-path "./tests/sample_ipam/migrations/" --skip-checkcommit --skip-checkendline --skip-flake8 --skip-isort
   - npm install -g jslint
   - jslint ./django_ipam/static/django-ipam/js/*.js
 
@@ -29,15 +27,20 @@ install:
   - pip install "django>=2.0,<2.3"
   - python setup.py -q develop
 
-before_script:
+script:
+  - >
+    openwisp-utils-qa-checks --migration-path "./django_ipam/migrations/ ./tests/sample_ipam/migrations/"
+    --skip-checkmakemigrations
   - |
     if [[ $TRAVIS_PYTHON_VERSION == 3.5 && $SAMPLE_APP != "1" ]]; then
-      OUTPUT=$(./tests/manage.py makemigrations --dry-run django_ipam)
-      echo $OUTPUT
-      echo $OUTPUT | grep "No changes detected"
+      openwisp-utils-qa-checks \
+        --skip-isort \
+        --skip-flake8 \
+        --skip-checkmigrations \
+        --skip-checkendline \
+        --skip-checkcommit \
+        --migration-module django_ipam
     fi
-
-script:
   - coverage run --source=django_ipam runtests.py
 
 after_success:
