@@ -1,5 +1,5 @@
 import csv
-from ipaddress import IPv4Network, IPv6Network, ip_address
+from ipaddress import ip_address
 
 import swapper
 from django import forms
@@ -11,6 +11,7 @@ from django.urls import path, re_path, reverse
 from django.utils.translation import gettext_lazy as _
 from openwisp_utils.admin import TimeReadonlyAdminMixin
 
+from ..api.generics import HostsSet
 from .forms import IpAddressImportForm
 from .models import CsvImportException
 
@@ -54,42 +55,22 @@ class AbstractSubnetAdmin(TimeReadonlyAdminMixin, ModelAdmin):
             subnet_tree.append(instance_subnets)
             collection_depth += 1
 
-        if type(instance.subnet) == IPv4Network:
-            show_visual = True
-            total = [host for host in instance.subnet.hosts()]
-            used = len(list(instance.ipaddress_set.all()))
-            used_ip = [ip_address(ip.ip_address) for ip in instance.ipaddress_set.all()]
-            available = len(total) - used
-            labels = ['Used', 'Available']
-            values = [used, available]
-            extra_context = {'labels': labels,
-                             'values': values,
-                             'total': total,
-                             'subnet': instance,
-                             'used_ip': used_ip,
-                             'show_visual': show_visual,
-                             'ipaddress_add_url': ipaddress_add_url,
-                             'ipaddress_change_url': ipaddress_change_url,
-                             'subnet_change_url': subnet_change_url,
-                             'show_subnet_tree': True,
-                             'subnet_tree': subnet_tree}
-
-        elif type(instance.subnet) == IPv6Network:
-            used_ip = [ip for ip in instance.ipaddress_set.all()]
-            used = len(used_ip)
-            available = 2 ** (128 - instance.subnet.prefixlen) - used
-            labels = ['Used', 'Available']
-            values = [used, available]
-            extra_context = {'labels': labels,
-                             'values': values,
-                             'used_ip': used_ip,
-                             'subnet': instance,
-                             'ipaddress_add_url': ipaddress_add_url,
-                             'ipaddress_change_url': ipaddress_change_url,
-                             'subnet_change_url': subnet_change_url,
-                             'show_subnet_tree': True,
-                             'subnet_tree': subnet_tree}
-
+        show_visual = True
+        used = len(list(instance.ipaddress_set.all()))
+        used_ip = [ip_address(ip.ip_address) for ip in instance.ipaddress_set.all()]
+        available = HostsSet(instance).count() - used
+        labels = ['Used', 'Available']
+        values = [used, available]
+        extra_context = {'labels': labels,
+                         'values': values,
+                         'subnet': instance,
+                         'used_ip': used_ip,
+                         'show_visual': show_visual,
+                         'ipaddress_add_url': ipaddress_add_url,
+                         'ipaddress_change_url': ipaddress_change_url,
+                         'subnet_change_url': subnet_change_url,
+                         'show_subnet_tree': True,
+                         'subnet_tree': subnet_tree}
         return super().change_view(request, object_id, form_url, extra_context)
 
     def get_urls(self):
@@ -138,6 +119,7 @@ class AbstractSubnetAdmin(TimeReadonlyAdminMixin, ModelAdmin):
     class Media:
         js = ('admin/js/jquery.init.js',
               'django-ipam/js/custom.js',
+              'django-ipam/js/hosts-infinite-scrolling.js',
               'django-ipam/js/minified/jstree.min.js',
               'django-ipam/js/minified/plotly.min.js',)
         css = {'all': ('django-ipam/css/admin.css',

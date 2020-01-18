@@ -29,3 +29,8 @@ class SubnetSerializer(ValidatedModelSerializer):
 
 class ImportSubnetSerializer(serializers.Serializer):
     csvfile = serializers.FileField()
+
+
+class HostsResponseSerializer(serializers.Serializer):
+    address = serializers.CharField()
+    used = serializers.BooleanField()

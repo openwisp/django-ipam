@@ -4,21 +4,24 @@
 
 .subnet-visual{
   text-align: justify;
-  margin: 10px 0 0;
+  margin: 10px 20px 0;
   padding: 0;
+  overflow-anchor: none;
+  overflow-y: scroll;
+  height: 700px;
 }
 
 .subnet-visual li{
-  display: inline;
+  display: inline-block;
   font-weight: bold;
 }
 
 .subnet-visual a {
   display: inline-block;
-  width: 100px;
+  width: 120px;
   text-align: center;
   padding: 5px 0;
-  margin: 0 0 10px 0;
+  margin: 0 5px 10px 5px;
   border-radius: 0;
   color: #fff;
   background: rgba(20, 102, 26, 0.9);
