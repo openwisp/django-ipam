@@ -5,7 +5,6 @@ dist: bionic
 cache: pip
 
 python:
-  - "3.5"
   - "3.6"
   - "3.7"
 
@@ -14,9 +13,10 @@ branches:
     - master
 
 env:
-  matrix:
-   - ''  # main tests
-   - SAMPLE_APP=1  # sample app tests
+  - DJANGO="django>=2.2,<3.0" # main tests
+  - DJANGO="django>=3.0,<3.1"
+  - DJANGO="django>=2.2,<3.0" SAMPLE_APP=1 # sample app tests
+  - DJANGO="django>=3.0,<3.1" SAMPLE_APP=1
 
 before_install:
   - pip install --no-cache-dir -U -r requirements-test.txt
@@ -24,15 +24,14 @@ before_install:
   - jslint ./django_ipam/static/django-ipam/js/*.js
 
 install:
-  - pip install "django>=2.0,<2.3"
+  - pip install $DJANGO
   - python setup.py -q develop
 
 script:
   - >
-    openwisp-utils-qa-checks --migration-path "./django_ipam/migrations/ ./tests/sample_ipam/migrations/"
-    --skip-checkmakemigrations
+    openwisp-utils-qa-checks --migration-path "./django_ipam/migrations/ ./tests/sample_ipam/migrations/" --skip-checkmakemigrations
   - |
-    if [[ $TRAVIS_PYTHON_VERSION == 3.5 && $SAMPLE_APP != "1" ]]; then
+    if [[ $SAMPLE_APP != "1" ]]; then
       openwisp-utils-qa-checks \
         --skip-isort \
         --skip-flake8 \

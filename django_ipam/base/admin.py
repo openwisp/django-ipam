@@ -32,7 +32,7 @@ class AbstractSubnetAdmin(TimeReadonlyAdminMixin, ModelAdmin):
         ipaddress_change_url = 'admin:{0}_ipaddress_change'.format(self.app_name)
         subnet_change_url = 'admin:{0}_subnet_change'.format(self.app_name)
         if request.GET.get('_popup'):
-            return super(AbstractSubnetAdmin, self).change_view(request, object_id, form_url, extra_context)
+            return super().change_view(request, object_id, form_url, extra_context)
         # Find root master_subnet for subnet tree
         instance_root = instance
         while instance_root.master_subnet:
@@ -90,7 +90,7 @@ class AbstractSubnetAdmin(TimeReadonlyAdminMixin, ModelAdmin):
                              'show_subnet_tree': True,
                              'subnet_tree': subnet_tree}
 
-        return super(AbstractSubnetAdmin, self).change_view(request, object_id, form_url, extra_context)
+        return super().change_view(request, object_id, form_url, extra_context)
 
     def get_urls(self):
         urls = super().get_urls()
@@ -146,7 +146,7 @@ class AbstractSubnetAdmin(TimeReadonlyAdminMixin, ModelAdmin):
 
 class IpAddressAdminForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-        super(IpAddressAdminForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['subnet'].help_text = _('Select a subnet and the first available IP address '
                                             'will be automatically suggested in the ip address field')
 
@@ -168,19 +168,19 @@ class AbstractIpAddressAdmin(TimeReadonlyAdminMixin, ModelAdmin):
         return {'get_first_available_ip_url': url}
 
     def add_view(self, request, form_url='', extra_context=None):
-        return super(AbstractIpAddressAdmin, self).add_view(request, form_url, self.get_extra_context())
+        return super().add_view(request, form_url, self.get_extra_context())
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
-        return super(AbstractIpAddressAdmin, self).change_view(request,
-                                                               object_id,
-                                                               form_url,
-                                                               self.get_extra_context())
+        return super().change_view(request,
+                                   object_id,
+                                   form_url,
+                                   self.get_extra_context())
 
     def response_add(self, request, *args, **kwargs):
         """
         Custom reponse to dismiss an add form popup for IP address.
         """
-        response = super(AbstractIpAddressAdmin, self).response_add(request, *args, **kwargs)
+        response = super().response_add(request, *args, **kwargs)
         if request.POST.get('_popup'):
             return HttpResponse("""
                <script type='text/javascript'>
