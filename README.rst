@@ -45,8 +45,8 @@ Available Features
 Project Goals
 =============
 
-* provide a django reusable app with features of IP Address management
-* provide abstract models which can be extended into other django based apps
+* Provide a django reusable app with features of IP Address management
+* Provide abstract models which can be extended into other django based apps
 
 ------------
 
@@ -58,22 +58,17 @@ Dependencies
 
 ------------
 
-Install Development Version
-===========================
+Installation for development
+============================
 
-Install for development version:
-
-.. code-block:: shell
-
-    pip install -r requirements-test.txt
-
-Install the development version using the following commands:
+Install ``django-ipam`` for development using following commands:
 
 .. code-block:: shell
 
     git clone https://github.com/openwisp/django-ipam.git
     cd django-ipam
     python setup.py develop
+    pip install -r requirements-test.txt
 
 Launch the development sever:
 
@@ -103,6 +98,23 @@ Then run the test suite:
 
     ./runtests.py
 
+------------
+
+Install development version
+===========================
+
+Install tarball:
+
+.. code-block:: shell
+
+    pip install https://github.com/openwisp/django-ipam/tarball/master
+
+Alternatively you can install via pip using git:
+
+.. code-block:: shell
+
+    pip install -e git+git://github.com/openwisp/django-ipam#egg=django-ipam
+    
 ------------
 
 Setup (Integrate into other Django Apps)
