@@ -54,6 +54,8 @@ class NetworkField(models.Field):
             raise ValidationError(e)
 
     def get_prep_value(self, value):
+        if value is None:
+            return None
         return str(self.to_python(value))
 
     def formfield(self, **kwargs):
