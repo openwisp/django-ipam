@@ -30,22 +30,6 @@
   <div>
     <h3>{% trans 'Subnet Visual Display' %}</h3>
     <ul class="subnet-visual">
-      {% for ipaddr in total %}
-        {% if ipaddr in used_ip %}
-          <li>
-            <a class="used">
-              {{ ipaddr }}
-            </a>
-          </li>
-        {% else %}
-          <li>
-            <a href="{% url ipaddress_add_url %}?_to_field=id&amp;_popup=1&amp;ip_address={{ ipaddr }}&amp;subnet={{ subnet.id }}"
-               onclick="return showAddAnotherPopup(this);">
-              {{ ipaddr }}
-            </a>
-          </li>
-        {% endif %}
-      {% endfor %}
     </ul>
   </div>
   {% else %}
@@ -70,13 +54,19 @@
 {% block admin_change_form_document_ready %}
   {{ block.super }}
   <script type="text/javascript">
+    var current_subnet = '{{ subnet.pk }}';
+    {% if show_visual %}
+      django.jQuery(document).ready(
+        function(){
+          initHostsInfiniteScroll(django.jQuery, current_subnet, '{% url ipaddress_add_url %}')
+        });
+    {% endif %}
     // Nested Subnet Tree
-    var current_subnet = "{{ subnet.id }}";
     subnet_tree = [];
     subnet_tree.push(
     {% for subnet_queryset in subnet_tree %}
       {% for subnet_item in subnet_queryset %}
-          {subnet_id: "{{ subnet_item.id }}", 
+          {subnet_id: "{{ subnet_item.pk }}", 
           subnet_tree_item: "{{ subnet_item.subnet }} ({{ subnet_item.name }})", 
           master_subnet: "{{ subnet_item.master_subnet }}",
           url: "{% url subnet_change_url subnet_item.id %}",

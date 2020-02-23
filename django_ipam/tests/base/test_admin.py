@@ -51,7 +51,7 @@ class BaseTestAdmin(object):
         response = self.client.get(reverse('admin:{0}_subnet_change'.format(self.app_name), args=[subnet.pk]),
                                    follow=True)
         self.assertContains(response, 'ok')
-        self.assertContains(response, '<h3>Used IP address</h3>')
+        self.assertContains(response, '<h3>Subnet Visual Display</h3>')
 
     def test_subnet_invalid_entry(self):
         post_data = self._post_data(subnet=1234,
