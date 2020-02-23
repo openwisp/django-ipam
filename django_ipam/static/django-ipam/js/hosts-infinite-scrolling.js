@@ -17,7 +17,7 @@ function initHostsInfiniteScroll($, current_subnet, address_add_url) {
             addr.address + '</a> </li>';
     }
     function pageContainer(page) {
-        var div = $("<div></div>");
+        var div = $("<div class=\"page\"></div>");
         page.forEach(function (address) {
             div.append(addressListItem(address));
         });

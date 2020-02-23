@@ -45,3 +45,5 @@
   background: rgba(149, 10, 10, 1);
   border: 1px solid rgba(0, 0, 0, 0.4);
 }
+
+.subnet-visual .page{ display: inline }
