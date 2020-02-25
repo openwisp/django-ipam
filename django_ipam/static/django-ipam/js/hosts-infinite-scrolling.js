@@ -10,7 +10,7 @@ function initHostsInfiniteScroll($, current_subnet, address_add_url) {
         lastRenderedPage = 0; //1 based indexing (0 -> no page rendered)
     function addressListItem(addr) {
         if (addr.used) {
-            return '<a class="used">' + addr.address + '</a> ';
+            return '<a class="used">' + addr.address + '</a>';
         }
         return '<a href=\"' + address_add_url + '?_to_field=id&amp;_popup=1&amp;ip_address=' +
             addr.address + '&amp;subnet=' + current_subnet + '"onclick="return showAddAnotherPopup(this);">' +
