@@ -118,6 +118,7 @@ class AbstractSubnetAdmin(TimeReadonlyAdminMixin, ModelAdmin):
 
     class Media:
         js = ('admin/js/jquery.init.js',
+              'admin/js/SelectBox.js',
               'django-ipam/js/custom.js',
               'django-ipam/js/hosts-infinite-scrolling.js',
               'django-ipam/js/minified/jstree.min.js',
