@@ -12,7 +12,7 @@ function initHostsInfiniteScroll($, current_subnet, address_add_url) {
         if (addr.used) {
             return '<a class="used">' + addr.address + '</a> ';
         }
-        return '<a href=\"{% url ipaddress_add_url %}?_to_field=id&amp;_popup=1&amp;ip_address=' +
+        return '<a href=\"' + address_add_url + '?_to_field=id&amp;_popup=1&amp;ip_address=' +
             addr.address + '&amp;subnet=' + current_subnet + '"onclick="return showAddAnotherPopup(this);">' +
             addr.address + '</a>';
     }
