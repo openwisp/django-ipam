@@ -1,5 +1,4 @@
 import csv
-from ipaddress import ip_address
 
 import swapper
 from django import forms
@@ -55,21 +54,16 @@ class AbstractSubnetAdmin(TimeReadonlyAdminMixin, ModelAdmin):
             subnet_tree.append(instance_subnets)
             collection_depth += 1
 
-        show_visual = True
-        used = len(list(instance.ipaddress_set.all()))
-        used_ip = [ip_address(ip.ip_address) for ip in instance.ipaddress_set.all()]
+        used = instance.ipaddress_set.count()
         available = HostsSet(instance).count() - used
         labels = ['Used', 'Available']
         values = [used, available]
         extra_context = {'labels': labels,
                          'values': values,
                          'original': instance,
-                         'used_ip': used_ip,
-                         'show_visual': show_visual,
                          'ipaddress_add_url': ipaddress_add_url,
                          'ipaddress_change_url': ipaddress_change_url,
                          'subnet_change_url': subnet_change_url,
-                         'show_subnet_tree': True,
                          'subnet_tree': subnet_tree}
         return super().change_view(request, object_id, form_url, extra_context)
 
