@@ -29,14 +29,14 @@
   border: 1px solid rgba(0, 0, 0, 0.4);
 }
 
-.subnet-visual li a.used{
+.subnet-visual a.used{
   background: rgba(149, 10, 10, 0.9);
   border: 1px solid rgba(0, 0, 0, 0.2);
   font-weight: bold;
   cursor: default;
 }
 
-.subnet-visual li a.used:hover{
+.subnet-visual a.used:hover{
   background: rgba(149, 10, 10, 1);
   border: 1px solid rgba(0, 0, 0, 0.4);
 }
