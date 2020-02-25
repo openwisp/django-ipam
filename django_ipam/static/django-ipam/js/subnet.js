@@ -1,12 +1,33 @@
-/*browser:true */
+/*jslint browser:true */
 /*globals onUpdate*/
 
+function dismissAddAnotherPopup(win) {
+    'use strict';
+    win.close();
+    window.location.reload();
+}
+
+django.jQuery(function ($) {
+    'use strict';
+    $('#jstree').on('ready.jstree', function (e, data) {
+        // A trick to open the tree automatically
+        // till the point of the current node only.
+        $('#jstree').jstree(true).select_node(window.current_subnet);
+        $('#jstree').jstree(true).deselect_node(window.current_subnet);
+    });
+    $('#jstree').jstree().bind('activate_node.jstree', function (e, data) {
+        // Open the specific subnet page that used clicked on.
+        document.location.href = data.node.a_attr.href;
+    });
+});
+
+
 function initHostsInfiniteScroll($, current_subnet, address_add_url) {
-    "use strict";
+    'use strict';
     var renderedPages = 5,
         fetchedPages = [],
         busy = false,
-        nextPageUrl = "/api/v1/subnet/" + current_subnet + "/hosts",
+        nextPageUrl = '/api/v1/subnet/' + current_subnet + '/hosts',
         lastRenderedPage = 0; //1 based indexing (0 -> no page rendered)
     function addressListItem(addr) {
         if (addr.used) {
@@ -17,7 +38,7 @@ function initHostsInfiniteScroll($, current_subnet, address_add_url) {
             addr.address + '</a>';
     }
     function pageContainer(page) {
-        var div = $("<div class=\"page\"></div>");
+        var div = $('<div class="page"></div>');
         page.forEach(function (address) {
             div.append(addressListItem(address));
         });
