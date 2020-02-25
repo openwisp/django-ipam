@@ -10,11 +10,11 @@ function initHostsInfiniteScroll($, current_subnet, address_add_url) {
         lastRenderedPage = 0; //1 based indexing (0 -> no page rendered)
     function addressListItem(addr) {
         if (addr.used) {
-            return '<li> <a class="used">' + addr.address + ' </a> </li>';
+            return '<a class="used">' + addr.address + '</a> ';
         }
-        return '<li> <a href=\"{% url ipaddress_add_url %}?_to_field=id&amp;_popup=1&amp;ip_address=' +
-            addr.address + '&amp;subnet=' + current_subnet + '"onclick="return showAddAnotherPopup(this);\">' +
-            addr.address + '</a> </li>';
+        return '<a href=\"{% url ipaddress_add_url %}?_to_field=id&amp;_popup=1&amp;ip_address=' +
+            addr.address + '&amp;subnet=' + current_subnet + '"onclick="return showAddAnotherPopup(this);">' +
+            addr.address + '</a>';
     }
     function pageContainer(page) {
         var div = $("<div class=\"page\"></div>");
