@@ -63,7 +63,7 @@ class AbstractSubnetAdmin(TimeReadonlyAdminMixin, ModelAdmin):
         values = [used, available]
         extra_context = {'labels': labels,
                          'values': values,
-                         'subnet': instance,
+                         'original': instance,
                          'used_ip': used_ip,
                          'show_visual': show_visual,
                          'ipaddress_add_url': ipaddress_add_url,

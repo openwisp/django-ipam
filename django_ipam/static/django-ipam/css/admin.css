@@ -3,7 +3,6 @@
 }
 
 .subnet-visual{
-  text-align: justify;
   margin: 10px 20px 0;
   padding: 0;
   overflow-anchor: none;
@@ -24,19 +23,25 @@
   font-weight: normal;
 }
 
+.subnet-visual.ipv6 a {
+    font-size: 12px;
+    letter-spacing: -0.2px;
+    width: 240px;
+    padding: 8px 5px;
+}
+
 .subnet-visual a:hover{
   background: rgba(20, 102, 26, 1);
   border: 1px solid rgba(0, 0, 0, 0.4);
 }
 
-.subnet-visual li a.used{
+.subnet-visual a.used{
   background: rgba(149, 10, 10, 0.9);
   border: 1px solid rgba(0, 0, 0, 0.2);
-  font-weight: bold;
   cursor: default;
 }
 
-.subnet-visual li a.used:hover{
+.subnet-visual a.used:hover{
   background: rgba(149, 10, 10, 1);
   border: 1px solid rgba(0, 0, 0, 0.4);
 }
