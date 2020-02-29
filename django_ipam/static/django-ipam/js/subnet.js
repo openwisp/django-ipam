@@ -62,7 +62,6 @@ function initHostsInfiniteScroll($, current_subnet, address_add_url) {
             success: function (res) {
                 fetchedPages.push(res.results);
                 nextPageUrl = res.next;
-                console.log(nextPageUrl);
                 appendPage();
             },
             error: function (error) {
