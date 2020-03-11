@@ -21,6 +21,7 @@
   background: rgba(20, 102, 26, 0.9);
   border: 1px solid rgba(0, 0, 0, 0.2);
   font-weight: normal;
+  text-decoration: none !important;
 }
 
 .subnet-visual.ipv6 a {
