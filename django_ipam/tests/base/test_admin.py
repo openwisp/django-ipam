@@ -96,7 +96,7 @@ class BaseTestAdmin(object):
                                     _popup=1)
         response = self.client.post(reverse('admin:{0}_ipaddress_add'.format(self.app_name)),
                                     json.loads(post_data))
-        self.assertContains(response, 'opener.dismissAddAnotherPopup(window);')
+        self.assertContains(response, 'opener.dismissAddAnotherPopup(window, \'10.0.0.1\');')
 
     def test_csv_upload(self):
         csv_data = """Monachers - Matera,

@@ -158,9 +158,9 @@ class AbstractIpAddressAdmin(TimeReadonlyAdminMixin, ModelAdmin):
         """
         response = super().response_add(request, *args, **kwargs)
         if request.POST.get('_popup'):
-            return HttpResponse("""
+            return HttpResponse(f"""
                <script type='text/javascript'>
-                  opener.dismissAddAnotherPopup(window);
+                  opener.dismissAddAnotherPopup(window, '{request.POST.get('ip_address')}');
                </script>
              """)
         return response

@@ -1,10 +1,17 @@
 /*jslint browser:true */
 /*globals onUpdate*/
 
-function dismissAddAnotherPopup(win) {
+function normalizeIP(ip_address) {
+    'use strict';
+    return ip_address ? ip_address.split(':').join('').split('.').join('') : null;
+}
+
+function dismissAddAnotherPopup(win, ip_address) {
     'use strict';
     win.close();
-    window.location.reload();
+    var id = normalizeIP(ip_address);
+    var host = django.jQuery('#addr_' + id);
+    host.replaceWith('<a class="used" id="addr_' + id + '">' + ip_address + '</a>');
 }
 
 django.jQuery(function ($) {
@@ -30,11 +37,13 @@ function initHostsInfiniteScroll($, current_subnet, address_add_url) {
         nextPageUrl = '/api/v1/subnet/' + current_subnet + '/hosts',
         lastRenderedPage = 0; //1 based indexing (0 -> no page rendered)
     function addressListItem(addr) {
+        var id = normalizeIP(addr.address);
         if (addr.used) {
-            return '<a class="used">' + addr.address + '</a>';
+            return '<a class="used" id="addr_' + id + '">' + addr.address + '</a>';
         }
         return '<a href=\"' + address_add_url + '?_to_field=id&amp;_popup=1&amp;ip_address=' +
-            addr.address + '&amp;subnet=' + current_subnet + '"onclick="return showAddAnotherPopup(this);">' +
+            addr.address + '&amp;subnet=' + current_subnet + '"onclick="return showAddAnotherPopup(this);" ' +
+            'id="addr_' + id + '">' +
             addr.address + '</a>';
     }
     function pageContainer(page) {
@@ -106,3 +115,4 @@ function initHostsInfiniteScroll($, current_subnet, address_add_url) {
     $('.subnet-visual').scroll(onUpdate);
     onUpdate();
 }
+
