@@ -73,7 +73,7 @@ class BaseTestAdmin(object):
                                    follow=True)
         self.assertContains(response, 'ok')
 
-    def test_ipaddress_response(self):
+    def test_add_ipaddress_response(self):
         subnet = self._create_subnet(subnet='10.0.0.0/24', description='Sample Subnet')
         post_data = self._post_data(ip_address='10.0.0.1',
                                     subnet=str(subnet.id),
@@ -85,7 +85,20 @@ class BaseTestAdmin(object):
                                     json.loads(post_data), follow=True)
         self.assertContains(response, 'ok')
 
-    def test_ipaddress_popup_response(self):
+    def test_change_ipaddress_response(self):
+        subnet = self._create_subnet(subnet='10.0.0.0/24', description='Sample Subnet')
+        obj = self._create_ipaddress(ip_address='10.0.0.2', subnet=subnet)
+        post_data = self._post_data(ip_address='10.0.0.2',
+                                    subnet=str(subnet.id),
+                                    created_0='2017-08-08',
+                                    created_1='15:16:10',
+                                    modified_0='2019-08-08',
+                                    modified_1='15:16:10')
+        response = self.client.post(reverse(f'admin:{self.app_name}_ipaddress_change', args=[obj.pk]),
+                                    json.loads(post_data), follow=True)
+        self.assertContains(response, 'ok')
+
+    def test_add_ipaddress_popup_response(self):
         subnet = self._create_subnet(subnet='10.0.0.0/24', description='Sample Subnet')
         post_data = self._post_data(ip_address='10.0.0.1',
                                     subnet=str(subnet.id),
@@ -97,6 +110,20 @@ class BaseTestAdmin(object):
         response = self.client.post(reverse('admin:{0}_ipaddress_add'.format(self.app_name)),
                                     json.loads(post_data))
         self.assertContains(response, 'opener.dismissAddAnotherPopup(window, \'10.0.0.1\');')
+
+    def test_change_ipaddress_popup_response(self):
+        subnet = self._create_subnet(subnet='10.0.0.0/24', description='Sample Subnet')
+        obj = self._create_ipaddress(ip_address='10.0.0.2', subnet=subnet)
+        post_data = self._post_data(ip_address='10.0.0.2',
+                                    subnet=str(subnet.id),
+                                    created_0='2017-08-08',
+                                    created_1='15:16:10',
+                                    modified_0='2019-08-08',
+                                    modified_1='15:16:10',
+                                    _popup=1)
+        response = self.client.post(reverse(f'admin:{self.app_name}_ipaddress_change', args=[obj.pk]),
+                                    json.loads(post_data))
+        self.assertContains(response, 'opener.dismissAddAnotherPopup(window);')
 
     def test_csv_upload(self):
         csv_data = """Monachers - Matera,

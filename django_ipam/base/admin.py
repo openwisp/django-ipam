@@ -1,9 +1,12 @@
 import csv
+from collections import OrderedDict
 
 import swapper
 from django import forms
 from django.contrib import messages
 from django.contrib.admin import ModelAdmin
+from django.db.models import TextField
+from django.db.models.functions import Cast
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import path, re_path, reverse
@@ -55,12 +58,24 @@ class AbstractSubnetAdmin(TimeReadonlyAdminMixin, ModelAdmin):
             collection_depth += 1
 
         used = instance.ipaddress_set.count()
+
+        # Storing UUID corresponding to respective IP address in a dictionary
+        ip_id_list = IpAddress.objects.filter(subnet=instance) \
+                                      .annotate(str_id=Cast('id', output_field=TextField())) \
+                                      .values_list('ip_address', 'str_id')
+
+        # Converting UUIdField to String and then modifying to convert back to uuid form
+        ip_id_list = OrderedDict(ip_id_list)
+        ip_uuid = {}
+        for ip_addr, Ip in ip_id_list.items():
+            ip_uuid[ip_addr] = f'{Ip[0:8]}-{Ip[8:12]}-{Ip[12:16]}-{Ip[16:20]}-{Ip[20:]}'
         available = HostsSet(instance).count() - used
         labels = ['Used', 'Available']
         values = [used, available]
         extra_context = {'labels': labels,
                          'values': values,
                          'original': instance,
+                         'ip_uuid': ip_uuid,
                          'ipaddress_add_url': ipaddress_add_url,
                          'ipaddress_change_url': ipaddress_change_url,
                          'subnet_change_url': subnet_change_url,
@@ -161,6 +176,19 @@ class AbstractIpAddressAdmin(TimeReadonlyAdminMixin, ModelAdmin):
             return HttpResponse(f"""
                <script type='text/javascript'>
                   opener.dismissAddAnotherPopup(window, '{request.POST.get('ip_address')}');
+               </script>
+             """)
+        return response
+
+    def response_change(self, request, *args, **kwargs):
+        """
+        Custom reponse to dismiss a change form popup for IP address.
+        """
+        response = super().response_change(request, *args, **kwargs)
+        if request.POST.get('_popup'):
+            return HttpResponse("""
+               <script type='text/javascript'>
+                  opener.dismissAddAnotherPopup(window);
                </script>
              """)
         return response

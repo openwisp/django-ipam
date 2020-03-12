@@ -39,7 +39,6 @@
 .subnet-visual a.used{
   background: rgba(149, 10, 10, 0.9);
   border: 1px solid rgba(0, 0, 0, 0.2);
-  cursor: default;
 }
 
 .subnet-visual a.used:hover{
