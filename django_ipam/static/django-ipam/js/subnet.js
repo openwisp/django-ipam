@@ -29,7 +29,7 @@ django.jQuery(function ($) {
 });
 
 
-function initHostsInfiniteScroll($, current_subnet, address_add_url) {
+function initHostsInfiniteScroll($, current_subnet, address_add_url, address_change_url, ip_uuid) {
     'use strict';
     var renderedPages = 5,
         fetchedPages = [],
@@ -39,7 +39,12 @@ function initHostsInfiniteScroll($, current_subnet, address_add_url) {
     function addressListItem(addr) {
         var id = normalizeIP(addr.address);
         if (addr.used) {
-            return '<a class="used" id="addr_' + id + '">' + addr.address + '</a>';
+            var uuid = ip_uuid[addr.address];
+            //note 1234 was passed as a dummy to be later on replaced in the script
+            return '<a class = "used" href=\"' + address_change_url.replace('1234', uuid) +
+                    '?_to_field=id&amp;_popup=1&amp;ip_address=' + addr.address +
+                    '&amp;subnet=' + current_subnet + '"onclick="return showAddAnotherPopup(this);">' +
+                    addr.address + '</a>';
         }
         return '<a href=\"' + address_add_url + '?_to_field=id&amp;_popup=1&amp;ip_address=' +
             addr.address + '&amp;subnet=' + current_subnet + '"onclick="return showAddAnotherPopup(this);" ' +
