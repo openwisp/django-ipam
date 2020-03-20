@@ -42,7 +42,7 @@ class AbstractSubnetAdmin(TimeReadonlyAdminMixin, ModelAdmin):
             instance_root = Subnet.objects.get(subnet=instance_root.master_subnet.subnet)
         # Get instances for all subnets for root master_subnet
         instance_subnets = Subnet.objects.filter(subnet=instance_root.subnet) \
-                                         .values("master_subnet", "id",
+                                         .values("master_subnet", "pk",
                                                  "name", "subnet")
         # Make subnet tree
         collection_depth = 0
@@ -51,8 +51,8 @@ class AbstractSubnetAdmin(TimeReadonlyAdminMixin, ModelAdmin):
             instance_subnets = Subnet.objects.none()
             for slave_subnet in subnet_tree[collection_depth]:
                 instance_subnets = \
-                    instance_subnets | Subnet.objects.filter(master_subnet=slave_subnet["id"]) \
-                                                     .values("master_subnet", "id",
+                    instance_subnets | Subnet.objects.filter(master_subnet=slave_subnet["pk"]) \
+                                                     .values("master_subnet", "pk",
                                                              "name", "subnet")
             subnet_tree.append(instance_subnets)
             collection_depth += 1
