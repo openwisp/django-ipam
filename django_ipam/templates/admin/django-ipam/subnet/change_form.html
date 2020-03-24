@@ -51,7 +51,7 @@
           {subnet_id: "{{ subnet_item.pk }}",
           subnet_tree_item: "{{ subnet_item.subnet }} ({{ subnet_item.name }})",
           master_subnet: "{{ subnet_item.master_subnet }}",
-          url: "{% url subnet_change_url subnet_item.id %}",
+          url: "{% url subnet_change_url subnet_item.pk %}",
         },
       {% endfor %}
     {% endfor %}
